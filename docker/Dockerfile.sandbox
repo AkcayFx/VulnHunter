@@ -1,46 +1,68 @@
 # VulnHunter Pro Tool Sandbox Image
 # Contains professional pentesting tools pre-installed.
 # Build: docker build -t vulnhunter-sandbox:latest -f docker/Dockerfile.sandbox .
+#
+# Pinned release URLs: .../latest/download/*_linux_amd64.zip returns HTML for ProjectDiscovery; use versioned assets.
 
 FROM python:3.12-slim
+
+ARG NUCLEI_VER=3.7.1
+ARG HTTPX_VER=1.9.0
+ARG SUBFINDER_VER=2.13.0
+ARG KATANA_VER=1.5.0
+ARG FFUF_VER=2.1.0
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nmap curl wget unzip git jq dnsutils whois netcat-openbsd \
     libpcap-dev ca-certificates && rm -rf /var/lib/apt/lists/*
 
 # Nuclei — vulnerability scanner with 8000+ templates
-RUN curl -sL https://github.com/projectdiscovery/nuclei/releases/latest/download/nuclei_linux_amd64.zip \
-    -o /tmp/nuclei.zip && unzip /tmp/nuclei.zip -d /usr/local/bin/ && rm /tmp/nuclei.zip
+RUN curl -fSL "https://github.com/projectdiscovery/nuclei/releases/download/v${NUCLEI_VER}/nuclei_${NUCLEI_VER}_linux_amd64.zip" \
+    -o /tmp/nuclei.zip && unzip -o /tmp/nuclei.zip -d /usr/local/bin/ && rm /tmp/nuclei.zip \
+    && chmod +x /usr/local/bin/nuclei
 RUN nuclei -update-templates 2>/dev/null || true
 
 # httpx — fast HTTP prober
-RUN curl -sL https://github.com/projectdiscovery/httpx/releases/latest/download/httpx_linux_amd64.zip \
-    -o /tmp/httpx.zip && unzip /tmp/httpx.zip -d /usr/local/bin/ && rm /tmp/httpx.zip
+RUN curl -fSL "https://github.com/projectdiscovery/httpx/releases/download/v${HTTPX_VER}/httpx_${HTTPX_VER}_linux_amd64.zip" \
+    -o /tmp/httpx.zip && unzip -o /tmp/httpx.zip -d /usr/local/bin/ && rm /tmp/httpx.zip \
+    && chmod +x /usr/local/bin/httpx
 
 # subfinder — subdomain discovery
-RUN curl -sL https://github.com/projectdiscovery/subfinder/releases/latest/download/subfinder_linux_amd64.zip \
-    -o /tmp/subfinder.zip && unzip /tmp/subfinder.zip -d /usr/local/bin/ && rm /tmp/subfinder.zip
+RUN curl -fSL "https://github.com/projectdiscovery/subfinder/releases/download/v${SUBFINDER_VER}/subfinder_${SUBFINDER_VER}_linux_amd64.zip" \
+    -o /tmp/subfinder.zip && unzip -o /tmp/subfinder.zip -d /usr/local/bin/ && rm /tmp/subfinder.zip \
+    && chmod +x /usr/local/bin/subfinder
 
 # ffuf — web fuzzer
-RUN curl -sL https://github.com/ffuf/ffuf/releases/latest/download/ffuf_linux_amd64.tar.gz \
-    | tar xz -C /usr/local/bin/
+RUN curl -fSL "https://github.com/ffuf/ffuf/releases/download/v${FFUF_VER}/ffuf_${FFUF_VER}_linux_amd64.tar.gz" \
+    | tar xz -C /usr/local/bin/ && chmod +x /usr/local/bin/ffuf
 
 # sqlmap — SQL injection tool
 RUN pip install --no-cache-dir sqlmap
 
-# nikto — web server scanner
-RUN apt-get update && apt-get install -y --no-install-recommends nikto && rm -rf /var/lib/apt/lists/*
+# nikto — web scanner (not in Debian trixie repos; install from upstream)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    perl libnet-ssleay-perl libio-socket-ssl-perl libjson-perl \
+    libxml-writer-perl libcgi-pm-perl libhtml-parser-perl \
+    && rm -rf /var/lib/apt/lists/* \
+    && git clone --depth 1 https://github.com/sullo/nikto.git /opt/nikto \
+    && chmod +x /opt/nikto/program/nikto.pl \
+    && ln -sf /opt/nikto/program/nikto.pl /usr/local/bin/nikto
 
 # katana — web crawler
-RUN curl -sL https://github.com/projectdiscovery/katana/releases/latest/download/katana_linux_amd64.zip \
-    -o /tmp/katana.zip && unzip /tmp/katana.zip -d /usr/local/bin/ && rm /tmp/katana.zip
+RUN curl -fSL "https://github.com/projectdiscovery/katana/releases/download/v${KATANA_VER}/katana_${KATANA_VER}_linux_amd64.zip" \
+    -o /tmp/katana.zip && unzip -o /tmp/katana.zip -d /usr/local/bin/ && rm /tmp/katana.zip \
+    && chmod +x /usr/local/bin/katana
 
 # Common wordlists
 RUN mkdir -p /wordlists && \
-    curl -sL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt \
+    curl -fSL "https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt" \
     -o /wordlists/common.txt && \
-    curl -sL https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/directory-list-2.3-small.txt \
+    curl -fSL "https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-small.txt" \
     -o /wordlists/directory-list-small.txt
+
+# Run as non-root user
+RUN useradd -m -u 1000 scanner
+USER scanner
 
 WORKDIR /workspace
 CMD ["sleep", "infinity"]

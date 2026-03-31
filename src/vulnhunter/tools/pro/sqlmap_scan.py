@@ -69,7 +69,7 @@ class SqlmapScanTool(BaseTool):
         risk = kwargs.get("risk", 2)
 
         cmd = [
-            "python3", "-m", "sqlmap",
+            "sqlmap",
             "-u", url,
             "--batch",
             f"--level={level}",
