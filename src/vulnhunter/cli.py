@@ -18,7 +18,7 @@ from rich.table import Table
 from rich.text import Text
 
 from vulnhunter import __version__
-from vulnhunter.config import load_config
+from vulnhunter.config import apply_scan_sandbox_cli, load_config
 from vulnhunter.models import AgentAction, ScanPhase, ScanTarget
 
 console = Console()
@@ -55,19 +55,29 @@ def main():
 @click.option("--fail-on", "fail_on", default="high", help="Minimum severity to fail CI: low, medium, high, critical")
 @click.option("--sarif", "sarif_path", default=None, help="Output SARIF file for GitHub Security tab")
 @click.option("--lightweight", is_flag=True, help="Lightweight mode — Python-native tools only, no Docker")
-@click.option("--nuclei-only", is_flag=True, help="Run only Nuclei template scanning (requires sandbox)")
+@click.option("--sandbox", is_flag=True, help="Enable Docker sandbox for Nmap, Nuclei, ffuf, sqlmap, etc.")
+@click.option("--nuclei-only", is_flag=True, help="Run only Nuclei template scanning (implies --sandbox)")
 @click.option("--severity", default=None, help="Filter by severity (e.g., critical,high)")
 def scan(
     target: str, config_path: str | None, ports: str | None, no_ai: bool,
     output_dir: str, output_file: str | None, scope_path: str | None,
     ci: bool, fail_on: str, sarif_path: str | None,
-    lightweight: bool, nuclei_only: bool, severity: str | None,
+    lightweight: bool, sandbox: bool, nuclei_only: bool, severity: str | None,
 ):
     """Run a penetration test against TARGET."""
     if not ci:
         console.print(BANNER)
 
+    if nuclei_only and lightweight:
+        if ci:
+            import json as _json
+            print(_json.dumps({"error": "--nuclei-only cannot be combined with --lightweight", "pass": False}))
+        else:
+            console.print("  [bold red]Error:[/bold red] --nuclei-only cannot be used with --lightweight")
+        raise SystemExit(2)
+
     cfg = load_config(Path(config_path) if config_path else None)
+    cfg = apply_scan_sandbox_cli(cfg, lightweight=lightweight, sandbox=sandbox or nuclei_only)
 
     # Parse ports
     port_list: list[int] = []
@@ -105,6 +115,8 @@ def scan(
         console.print(f"  [bold cyan]Stealth:[/bold cyan] {cfg.stealth_mode}")
         if lightweight:
             console.print(f"  [bold cyan]Mode:[/bold cyan] Lightweight (Python-native only)")
+        elif cfg.sandbox.enabled:
+            console.print(f"  [bold cyan]Docker sandbox:[/bold cyan] enabled ({cfg.sandbox.image})")
         console.print()
 
     # Action callback
@@ -248,14 +260,29 @@ def scan(
 
 @main.command()
 @click.argument("target")
+@click.option("--config", "-c", "config_path", type=click.Path(exists=True), default=None, help="Path to YAML config")
 @click.option("--scope", "scope_path", type=click.Path(exists=True), default=None, help="Path to scope YAML")
 @click.option("--output", "-o", "output_file", default="recon.json", help="Output file for recon results")
-def recon(target: str, scope_path: str | None, output_file: str):
+@click.option("--lightweight", is_flag=True, help="Python-native tools only, no Docker sandbox")
+@click.option("--sandbox", is_flag=True, help="Enable Docker sandbox for pro tools")
+def recon(
+    target: str,
+    config_path: str | None,
+    scope_path: str | None,
+    output_file: str,
+    lightweight: bool,
+    sandbox: bool,
+):
     """Run only the reconnaissance pipeline against TARGET."""
     console.print(BANNER)
     console.print(f"  [bold cyan]Recon-only mode:[/bold cyan] {target}\n")
 
-    cfg = load_config()
+    cfg = load_config(Path(config_path) if config_path else None)
+    cfg = apply_scan_sandbox_cli(cfg, lightweight=lightweight, sandbox=sandbox)
+    if lightweight:
+        console.print("  [bold cyan]Mode:[/bold cyan] Lightweight (Python-native only)\n")
+    elif cfg.sandbox.enabled:
+        console.print(f"  [bold cyan]Docker sandbox:[/bold cyan] enabled ({cfg.sandbox.image})\n")
     scan_target = ScanTarget(host=target)
 
     scope_manager = None

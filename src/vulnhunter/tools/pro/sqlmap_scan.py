@@ -5,6 +5,7 @@ from typing import Any
 
 from vulnhunter.models import ToolResult
 from vulnhunter.tools.base import BaseTool
+from vulnhunter.tools.pro.constants import SANDBOX_REQUIRED_MSG
 from vulnhunter.tools.pro.parsers import parse_sqlmap_output
 
 
@@ -59,7 +60,7 @@ class SqlmapScanTool(BaseTool):
 
     async def _execute(self, **kwargs: Any) -> ToolResult:
         if self.sandbox is None:
-            raise RuntimeError("sqlmap_scan requires Docker sandbox mode")
+            raise RuntimeError(SANDBOX_REQUIRED_MSG)
 
         url = kwargs["url"]
         method = kwargs.get("method", "GET")

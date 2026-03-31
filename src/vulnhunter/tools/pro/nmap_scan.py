@@ -5,6 +5,7 @@ from typing import Any
 
 from vulnhunter.models import Severity, ToolResult, Vulnerability
 from vulnhunter.tools.base import BaseTool
+from vulnhunter.tools.pro.constants import SANDBOX_REQUIRED_MSG
 from vulnhunter.tools.pro.parsers import parse_nmap_xml
 
 
@@ -49,7 +50,7 @@ class NmapScanTool(BaseTool):
 
     async def _execute(self, **kwargs: Any) -> ToolResult:
         if self.sandbox is None:
-            raise RuntimeError("nmap_scan requires Docker sandbox mode (--sandbox or sandbox.enabled=true)")
+            raise RuntimeError(SANDBOX_REQUIRED_MSG)
 
         target = kwargs["target"]
         ports = kwargs.get("ports", "top1000")

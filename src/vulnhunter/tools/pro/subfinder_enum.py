@@ -5,6 +5,7 @@ from typing import Any
 
 from vulnhunter.models import ToolResult
 from vulnhunter.tools.base import BaseTool
+from vulnhunter.tools.pro.constants import SANDBOX_REQUIRED_MSG
 from vulnhunter.tools.pro.parsers import parse_subfinder_jsonl
 
 
@@ -43,7 +44,7 @@ class SubfinderEnumTool(BaseTool):
 
     async def _execute(self, **kwargs: Any) -> ToolResult:
         if self.sandbox is None:
-            raise RuntimeError("subfinder_enum requires Docker sandbox mode")
+            raise RuntimeError(SANDBOX_REQUIRED_MSG)
 
         domain = kwargs["domain"]
         recursive = kwargs.get("recursive", False)

@@ -221,3 +221,19 @@ def load_config(config_path: Path | None = None) -> AppConfig:
         memory=memory,
         auth=auth,
     )
+
+
+def apply_scan_sandbox_cli(
+    cfg: AppConfig,
+    *,
+    lightweight: bool = False,
+    sandbox: bool = False,
+) -> AppConfig:
+    """Apply CLI flags for Docker sandbox. ``--lightweight`` forces sandbox off (wins over ``--sandbox``)."""
+    from dataclasses import replace
+
+    if lightweight:
+        return replace(cfg, sandbox=replace(cfg.sandbox, enabled=False))
+    if sandbox:
+        return replace(cfg, sandbox=replace(cfg.sandbox, enabled=True))
+    return cfg

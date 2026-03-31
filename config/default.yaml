@@ -113,6 +113,7 @@ reporting:
   output_dir: "./reports"
   formats: ["json", "html"]
 
+# Pro tools (Nmap, Nuclei, …) need enabled: true plus a built image; CLI --sandbox also turns this on.
 sandbox:
   enabled: false
   image: "vulnhunter-sandbox:latest"

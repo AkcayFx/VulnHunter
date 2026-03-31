@@ -95,8 +95,11 @@ from vulnhunter.models import (
 from vulnhunter.reporting.cvss import calculate_base_score, estimate_vector_from_vuln
 from vulnhunter.tools import ALL_TOOLS
 from vulnhunter.tools.base import BaseTool
+from vulnhunter.tools.pro import PRO_TOOLS
 
 logger = logging.getLogger("vulnhunter.orchestrator")
+
+_PRO_TOOL_CLASSES: frozenset[type] = frozenset(PRO_TOOLS)
 
 
 class OrchestratorAgent:
@@ -153,6 +156,8 @@ class OrchestratorAgent:
 
         tools: list[BaseTool] = []
         for tool_cls in ALL_TOOLS:
+            if tool_cls in _PRO_TOOL_CLASSES and not self.config.sandbox.enabled:
+                continue
             tool = tool_cls()
             if self.config.tool_enabled(tool.name):
                 if self.scope_manager is not None:
@@ -174,8 +179,9 @@ class OrchestratorAgent:
                     t.sandbox = executor
                 logger.info("Sandbox mode enabled — tools will run inside container")
             except Exception as e:
-                logger.warning(f"Sandbox init failed ({e}), running tools on host")
+                logger.warning(f"Sandbox init failed ({e}), pro tools disabled for this run")
                 sandbox_mgr = None
+                tools = [t for t in tools if type(t) not in _PRO_TOOL_CLASSES]
 
         try:
             report = await self._run_scan(llm, tools, target, report)

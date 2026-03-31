@@ -5,6 +5,7 @@ from typing import Any
 
 from vulnhunter.models import ToolResult
 from vulnhunter.tools.base import BaseTool
+from vulnhunter.tools.pro.constants import SANDBOX_REQUIRED_MSG
 from vulnhunter.tools.pro.parsers import parse_nikto_json
 
 
@@ -43,7 +44,7 @@ class NiktoScanTool(BaseTool):
 
     async def _execute(self, **kwargs: Any) -> ToolResult:
         if self.sandbox is None:
-            raise RuntimeError("nikto_scan requires Docker sandbox mode")
+            raise RuntimeError(SANDBOX_REQUIRED_MSG)
 
         target = kwargs["target"]
         tuning = kwargs.get("tuning", "")

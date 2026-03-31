@@ -85,6 +85,16 @@ copy .env.example .env   # Windows — then edit .env
 vulnhunter scan scanme.nmap.org --lightweight -o ./reports
 ```
 
+**Scan with Docker pro tools** (Nmap, Nuclei, ffuf, sqlmap, …): build the sandbox image, create the `vulnhunter-sandbox` Docker network if needed, then pass **`--sandbox`** (or set `sandbox.enabled: true` in `config/default.yaml`).
+
+```bash
+docker network create vulnhunter-sandbox 2>/dev/null || true
+docker build -f docker/Dockerfile.sandbox -t vulnhunter-sandbox:latest .
+vulnhunter scan example.com --sandbox -o ./reports
+```
+
+`--lightweight` keeps sandbox off and excludes pro tools even if your YAML enables them. The web UI uses YAML only (no `--sandbox` flag).
+
 **Web dashboard**:
 
 ```bash
@@ -112,11 +122,11 @@ See **`config/scope.example.yaml`** and **`config/default.yaml`** for tuning.
 | Command | Description |
 |---------|-------------|
 | `vulnhunter scan <target>` | Full assessment (AI on by default; use `--no-ai` to disable) |
-| `vulnhunter recon <target>` | Recon-focused run, JSON output |
+| `vulnhunter recon <target>` | Recon-focused run, JSON output (`--lightweight` / `--sandbox` supported) |
 | `vulnhunter ui` | Web UI |
 | `vulnhunter report` | Bug bounty report generation (DB-backed workflows) |
 
-Useful **`scan`** flags: `--lightweight`, `--nuclei-only`, `--ci`, `--fail-on`, `--sarif`, `--output-dir`, `--scope`, `--severity`.
+Useful **`scan`** flags: `--lightweight`, `--sandbox`, `--nuclei-only` (implies `--sandbox`), `--ci`, `--fail-on`, `--sarif`, `--output-dir`, `--scope`, `--severity`.
 
 ---
 

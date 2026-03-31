@@ -6,6 +6,7 @@ from typing import Any
 
 from vulnhunter.models import ToolResult
 from vulnhunter.nuclei.parser import parse_and_convert
+from vulnhunter.tools.pro.constants import SANDBOX_REQUIRED_MSG
 from vulnhunter.nuclei.template_manager import NucleiScanPlan, NucleiTemplateManager
 from vulnhunter.tools.base import BaseTool
 
@@ -87,7 +88,7 @@ class NucleiScanTool(BaseTool):
 
     async def _execute(self, **kwargs: Any) -> ToolResult:
         if self.sandbox is None:
-            raise RuntimeError("nuclei_scan requires Docker sandbox mode")
+            raise RuntimeError(SANDBOX_REQUIRED_MSG)
 
         target = kwargs["target"]
         profile = kwargs.get("profile", "quick")
