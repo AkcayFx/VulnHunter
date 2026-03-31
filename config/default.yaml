@@ -114,11 +114,14 @@ reporting:
   formats: ["json", "html"]
 
 # Pro tools (Nmap, Nuclei, …) need enabled: true plus a built image; CLI --sandbox also turns this on.
+# net_raw: grant NET_RAW (recommended for nmap). net_admin: optional NET_ADMIN (PentAGI-style).
 sandbox:
   enabled: false
   image: "vulnhunter-sandbox:latest"
   network: "vulnhunter-sandbox"
   timeout: 300
+  net_raw: true
+  net_admin: false
 
 ui:
   host: "127.0.0.1"

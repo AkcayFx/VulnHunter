@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
@@ -12,6 +12,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DEFAULT_CONFIG_PATH = Path(__file__).resolve().parent.parent.parent / "config" / "default.yaml"
+
+
+def _resolved_default_config_path() -> Path:
+    env = os.environ.get("VULNHUNTER_CONFIG_PATH")
+    if env:
+        return Path(env)
+    return DEFAULT_CONFIG_PATH
 
 
 PROVIDER_DEFAULTS: dict[str, dict[str, str]] = {
@@ -61,13 +68,16 @@ class ToolConfig:
 
 @dataclass(frozen=True)
 class DatabaseConfig:
-    url: str = "postgresql+asyncpg://vulnhunter:vulnhunter@localhost:5432/vulnhunter"
+    url: str = ""
     pool_size: int = 10
     max_overflow: int = 20
 
     @property
     def effective_url(self) -> str:
-        return os.environ.get("DATABASE_URL", self.url)
+        url = os.environ.get("DATABASE_URL", self.url)
+        if not url:
+            raise RuntimeError("DATABASE_URL environment variable must be set")
+        return url
 
 
 @dataclass(frozen=True)
@@ -76,6 +86,8 @@ class SandboxConfig:
     image: str = "python:3.12-slim"
     network: str = "vulnhunter-sandbox"
     timeout: int = 300
+    net_raw: bool = True
+    net_admin: bool = False
 
 
 @dataclass(frozen=True)
@@ -95,9 +107,10 @@ class AuthConfig:
     def effective_secret(self) -> str:
         key = os.environ.get("JWT_SECRET_KEY", self.secret_key)
         if not key:
-            import hashlib
-            machine_id = f"{os.getpid()}-{os.path.abspath(__file__)}"
-            key = hashlib.sha256(machine_id.encode()).hexdigest()
+            raise RuntimeError(
+                "JWT_SECRET_KEY must be set. Generate one with: "
+                'python -c "import secrets; print(secrets.token_hex(64))"'
+            )
         return key
 
 
@@ -125,7 +138,7 @@ class AppConfig:
 
 
 def load_config(config_path: Path | None = None) -> AppConfig:
-    path = config_path or DEFAULT_CONFIG_PATH
+    path = config_path or _resolved_default_config_path()
     if not path.exists():
         return AppConfig()
 
@@ -142,8 +155,9 @@ def load_config(config_path: Path | None = None) -> AppConfig:
     tools: dict[str, ToolConfig] = {}
     for name, settings in tools_raw.items():
         if isinstance(settings, dict):
-            enabled = settings.pop("enabled", True)
-            tools[name] = ToolConfig(enabled=enabled, settings=settings)
+            enabled = settings.get("enabled", True)
+            tool_settings = {k: v for k, v in settings.items() if k != "enabled"}
+            tools[name] = ToolConfig(enabled=enabled, settings=tool_settings)
         else:
             tools[name] = ToolConfig(enabled=True)
 
@@ -181,18 +195,30 @@ def load_config(config_path: Path | None = None) -> AppConfig:
 
     db_raw = raw.get("database", {})
     database = DatabaseConfig(
-        url=db_raw.get("url", "postgresql+asyncpg://vulnhunter:vulnhunter@localhost:5432/vulnhunter"),
+        url=db_raw.get("url", ""),
         pool_size=db_raw.get("pool_size", 10),
         max_overflow=db_raw.get("max_overflow", 20),
     )
 
     sandbox_raw = raw.get("sandbox", {})
+    if "net_admin" in sandbox_raw:
+        net_admin = bool(sandbox_raw["net_admin"])
+    else:
+        net_admin = os.environ.get("VULNHUNTER_SANDBOX_NET_ADMIN", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
     sandbox = SandboxConfig(
         enabled=sandbox_raw.get("enabled", False),
         image=sandbox_raw.get("image", "python:3.12-slim"),
         network=sandbox_raw.get("network", "vulnhunter-sandbox"),
         timeout=sandbox_raw.get("timeout", 300),
+        net_raw=sandbox_raw.get("net_raw", True),
+        net_admin=net_admin,
     )
+    if os.environ.get("VULNHUNTER_SANDBOX_ENABLED", "").lower() in ("1", "true", "yes"):
+        sandbox = replace(sandbox, enabled=True)
 
     memory_raw = raw.get("memory", {})
     memory = MemoryConfig(
@@ -230,8 +256,6 @@ def apply_scan_sandbox_cli(
     sandbox: bool = False,
 ) -> AppConfig:
     """Apply CLI flags for Docker sandbox. ``--lightweight`` forces sandbox off (wins over ``--sandbox``)."""
-    from dataclasses import replace
-
     if lightweight:
         return replace(cfg, sandbox=replace(cfg.sandbox, enabled=False))
     if sandbox:

@@ -31,15 +31,24 @@ class ContainerManager:
             logger.info(f"Pulling image {self.config.image}...")
             await self._docker.images.pull(self.config.image)
 
+        host_config: dict[str, Any] = {
+            "NetworkMode": self.config.network,
+            "Memory": 512 * 1024 * 1024,
+            "CpuPeriod": 100000,
+            "CpuQuota": 50000,
+        }
+        cap_add: list[str] = []
+        if self.config.net_raw:
+            cap_add.append("NET_RAW")
+        if self.config.net_admin:
+            cap_add.append("NET_ADMIN")
+        if cap_add:
+            host_config["CapAdd"] = cap_add
+
         container_config = {
             "Image": self.config.image,
             "Cmd": ["sleep", str(self.config.timeout)],
-            "HostConfig": {
-                "NetworkMode": self.config.network,
-                "Memory": 512 * 1024 * 1024,
-                "CpuPeriod": 100000,
-                "CpuQuota": 50000,
-            },
+            "HostConfig": host_config,
             "NetworkDisabled": False,
             "Tty": False,
         }

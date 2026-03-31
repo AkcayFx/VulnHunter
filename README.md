@@ -93,13 +93,21 @@ docker build -f docker/Dockerfile.sandbox -t vulnhunter-sandbox:latest .
 vulnhunter scan example.com --sandbox -o ./reports
 ```
 
-`--lightweight` keeps sandbox off and excludes pro tools even if your YAML enables them. The web UI uses YAML only (no `--sandbox` flag).
+`--lightweight` keeps sandbox off and excludes pro tools even if your YAML enables them. The web UI reads the same config as the CLI; when running under **Docker Compose**, `VULNHUNTER_SANDBOX_ENABLED=true` is set by default so pro tools work without editing YAML.
 
 **Web dashboard**:
 
 ```bash
 vulnhunter ui
 ```
+
+**Docker Compose** (PostgreSQL, web UI on port **8477**, host **Docker socket** for pro tools):
+
+1. Copy `.env.example` to `.env`. Set `POSTGRES_USER`, `POSTGRES_PASSWORD`, `JWT_SECRET_KEY`, and `DATABASE_URL` using host **`postgres`** (see `.env.example`). Set at least one LLM API key.
+2. Run `docker compose build` (builds the app image and **`vulnhunter-sandbox:latest`** via the `vulnhunter-sandbox` service).
+3. Run `docker compose up`. The app container uses `VULNHUNTER_CONFIG_PATH=/app/config/default.yaml` and enables the sandbox by default; child scanner containers join the **`vulnhunter-sandbox`** network.
+
+On Windows with Docker Desktop, the default `DOCKER_SOCK` bind is usually correct; override if your engine uses a different socket path. Set `VULNHUNTER_SANDBOX_ENABLED=false` in `.env` to match local YAML-only behavior.
 
 **CI-style run** (JSON summary + exit code; optional SARIF for GitHub Security tab):
 
@@ -144,7 +152,8 @@ The repository includes **`action.yml`** so you can run VulnHunter as a workflow
 - `src/vulnhunter/reporting/` — HTML/JSON/PDF, CVSS, SARIF, bounty-oriented output  
 - `src/vulnhunter/ui/` — Dashboard static assets and server  
 - `src/vulnhunter/sandbox/` — Container execution for pro tools  
-- `docker/` — Sandbox image definitions  
+- `Dockerfile` — Application image (Compose / production-style runs)  
+- `docker/` — Sandbox image (`Dockerfile.sandbox`)  
 
 ---
 
