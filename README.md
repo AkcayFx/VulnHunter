@@ -29,7 +29,6 @@ Regenerate a sample report or screenshot using the commands in [`docs/assets/REA
 
 ![VulnHunter HTML security report](docs/assets/report-preview.png)
 
-*Add `report-preview.png` under `docs/assets/` (see [`docs/assets/README.md`](docs/assets/README.md)) or replace the path with your own screenshot.*
 
 ---
 
