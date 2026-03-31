@@ -1,0 +1,2373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VulnHunter Report — scanme.nmap.org</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+        header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding: 40px 0;
+            border-bottom: 2px solid #e94560;
+            margin-bottom: 32px;
+        }
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        header .subtitle { color: #8892b0; font-size: 0.95rem; }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .meta-card {
+            background: #12121a;
+            border: 1px solid #1e1e2e;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        .meta-card .label { font-size: 0.8rem; color: #8892b0; text-transform: uppercase; letter-spacing: 1px; }
+        .meta-card .value { font-size: 1.8rem; font-weight: 700; margin-top: 8px; }
+        .risk-score { color: #ff4444; font-size: 2.5rem !important; }
+        .section {
+            background: #12121a;
+            border: 1px solid #1e1e2e;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .section h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #1e1e2e;
+            color: #e94560;
+        }
+        .summary-text { color: #b0b0b0; font-size: 1.05rem; line-height: 1.8; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { background: #1a1a2e; color: #e94560; text-align: left; padding: 12px; font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid #1e1e2e; }
+        tr:hover { background: #15152a; }
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        code { font-family: 'JetBrains Mono', monospace; background: #1a1a2e; padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
+        ol { padding-left: 24px; }
+        ol li { margin-bottom: 8px; color: #b0b0b0; }
+        .footer { text-align: center; color: #555; margin-top: 40px; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>VulnHunter Security Report</h1>
+            <p class="subtitle">Target: scanme.nmap.org | Scanned: 2026-03-31 12:17:34 UTC | Duration: 2068.1s</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="meta-grid">
+            <div class="meta-card">
+                <div class="label">Risk Score</div>
+                <div class="value risk-score">8.2</div>
+            </div>
+            <div class="meta-card">
+                <div class="label">Threat Level</div>
+                <div class="value">High</div>
+            </div>
+            <div class="meta-card">
+                <div class="label">Vulnerabilities</div>
+                <div class="value">139</div>
+            </div>
+            <div class="meta-card">
+                <div class="label">Tools Run</div>
+                <div class="value">160</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Executive Summary</h2>
+            <p class="summary-text">Security assessment of scanme.nmap.org and nmap.org infrastructure revealed multiple critical vulnerabilities including password reset token theft, server-side request forgery allowing internal network access, and widespread open redirects. The absence of HTTPS on scanme.nmap.org and unencrypted FTP services further expose the infrastructure to data interception and credential theft.</p>
+        </div>
+
+        <div class="section">
+            <h2>Vulnerabilities (139)</h2>
+            <table>
+                <thead><tr><th>Severity</th><th>Title</th><th>Tool</th><th>Description</th><th>CWE</th><th>Remediation</th></tr></thead>
+                <tbody>
+        <tr>
+            <td><span class="badge" style="background:#ff4444">CRITICAL</span></td>
+            <td>Password Reset Poisoning via Host Header</td>
+            <td>host_header_injection</td>
+            <td>Password reset endpoint http://nmap.org/reset-password uses the Host header to generate the reset link. An attacker can poison the Host to steal reset tokens.</td>
+            <td><code>CWE-644</code></td>
+            <td>Use a hardcoded base URL for password reset links, not the Host header.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff4444">CRITICAL</span></td>
+            <td>Password Reset Poisoning via Host Header</td>
+            <td>host_header_injection</td>
+            <td>Password reset endpoint http://scanme.nmap.org/reset-password uses the Host header to generate the reset link. An attacker can poison the Host to steal reset tokens.</td>
+            <td><code>CWE-644</code></td>
+            <td>Use a hardcoded base URL for password reset links, not the Host header.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff4444">CRITICAL</span></td>
+            <td>Password Reset Poisoning via Host Header</td>
+            <td>host_header_injection</td>
+            <td>Password reset endpoint http://scanme.nmap.org/reset-password uses the Host header to generate the reset link. An attacker can poison the Host to steal reset tokens.</td>
+            <td><code>CWE-644</code></td>
+            <td>Use a hardcoded base URL for password reset links, not the Host header.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff4444">CRITICAL</span></td>
+            <td>Password Reset Poisoning via Host Header</td>
+            <td>host_header_injection</td>
+            <td>Password reset endpoint http://scanme.nmap.org/reset-password uses the Host header to generate the reset link. An attacker can poison the Host to steal reset tokens.</td>
+            <td><code>CWE-644</code></td>
+            <td>Use a hardcoded base URL for password reset links, not the Host header.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff4444">CRITICAL</span></td>
+            <td>Password Reset Poisoning via Host Header</td>
+            <td>host_header_injection</td>
+            <td>Password reset endpoint https://nmap.org/reset-password uses the Host header to generate the reset link. An attacker can poison the Host to steal reset tokens.</td>
+            <td><code>CWE-644</code></td>
+            <td>Use a hardcoded base URL for password reset links, not the Host header.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>No HTTPS / SSL Not Available</td>
+            <td>ssl_checker</td>
+            <td>Port 443 is closed or not serving SSL/TLS on scanme.nmap.org</td>
+            <td><code>CWE-319</code></td>
+            <td>Deploy a TLS certificate and redirect all HTTP traffic to HTTPS</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Missing Strict-Transport-Security header</td>
+            <td>header_analyzer</td>
+            <td>Missing HSTS header allows downgrade attacks and cookie hijacking</td>
+            <td><code>CWE-319</code></td>
+            <td>Add 'Strict-Transport-Security: max-age=31536000; includeSubDomains' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Missing Strict-Transport-Security header</td>
+            <td>header_analyzer</td>
+            <td>Missing HSTS header allows downgrade attacks and cookie hijacking</td>
+            <td><code>CWE-319</code></td>
+            <td>Add 'Strict-Transport-Security: max-age=31536000; includeSubDomains' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>No HTTPS / SSL Not Available</td>
+            <td>ssl_checker</td>
+            <td>Port 443 is closed or not serving SSL/TLS on scanme.nmap.org</td>
+            <td><code>CWE-319</code></td>
+            <td>Deploy a TLS certificate and redirect all HTTP traffic to HTTPS</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>No HTTPS / SSL Not Available</td>
+            <td>ssl_checker</td>
+            <td>Port 443 is closed or not serving SSL/TLS on scanme.nmap.org</td>
+            <td><code>CWE-319</code></td>
+            <td>Deploy a TLS certificate and redirect all HTTP traffic to HTTPS</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Missing Strict-Transport-Security header</td>
+            <td>header_analyzer</td>
+            <td>Missing HSTS header allows downgrade attacks and cookie hijacking</td>
+            <td><code>CWE-319</code></td>
+            <td>Add 'Strict-Transport-Security: max-age=31536000; includeSubDomains' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'url' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'link' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'src' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'callback' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'url' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'link' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'src' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'callback' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'url' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'link' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'src' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'callback' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'url' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'link' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'src' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'callback' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: Host Override</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using Host Override. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: X-Original-URL</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Original-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: X-Rewrite-URL</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Rewrite-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'url' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'link' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'src' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'callback' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: X-Original-URL</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Original-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: X-Rewrite-URL</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Rewrite-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: X-Original-URL</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Original-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: X-Rewrite-URL</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Rewrite-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'url' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'redirect' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'redirect'. The server made a request to http://127.0.0.1 when injected via 'redirect'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'next' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'next'. The server made a request to http://127.0.0.1 when injected via 'next'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'url' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: X-Original-URL</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Original-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: X-Rewrite-URL</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Rewrite-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'url' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'link' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'src' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>SSRF via 'callback' parameter (localhost IPv4)</td>
+            <td>ssrf_detector</td>
+            <td>Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.</td>
+            <td><code>CWE-918</code></td>
+            <td>Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: Host Override</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using Host Override. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: X-Original-URL</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Original-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ff8c00">HIGH</span></td>
+            <td>Host Header Injection: X-Rewrite-URL</td>
+            <td>host_header_injection</td>
+            <td>The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Rewrite-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.</td>
+            <td><code>CWE-644</code></td>
+            <td>Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing SPF Record</td>
+            <td>dns_enum</td>
+            <td>No SPF record found — domain can be used for email spoofing</td>
+            <td><code>CWE-290</code></td>
+            <td>Add an SPF TXT record (e.g., 'v=spf1 include:_spf.google.com ~all')</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing DMARC Record</td>
+            <td>dns_enum</td>
+            <td>No DMARC record found — no email authentication enforcement</td>
+            <td><code>CWE-290</code></td>
+            <td>Add a DMARC TXT record at _dmarc.{domain}</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Risky service on port 21 (FTP)</td>
+            <td>port_scanner</td>
+            <td>FTP allows unencrypted file transfer</td>
+            <td><code>CWE-284</code></td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing Content-Security-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing CSP allows XSS and data injection attacks</td>
+            <td><code>CWE-79</code></td>
+            <td>Implement Content-Security-Policy header with strict directives</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing X-Frame-Options header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-Frame-Options allows clickjacking attacks</td>
+            <td><code>CWE-1021</code></td>
+            <td>Add 'X-Frame-Options: DENY' or 'SAMEORIGIN' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Risky service on port 21 (FTP)</td>
+            <td>port_scanner</td>
+            <td>FTP allows unencrypted file transfer</td>
+            <td><code>CWE-284</code></td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing DMARC Record</td>
+            <td>dns_enum</td>
+            <td>No DMARC record found — no email authentication enforcement</td>
+            <td><code>CWE-290</code></td>
+            <td>Add a DMARC TXT record at _dmarc.{domain}</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing Content-Security-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing CSP allows XSS and data injection attacks</td>
+            <td><code>CWE-79</code></td>
+            <td>Implement Content-Security-Policy header with strict directives</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing X-Frame-Options header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-Frame-Options allows clickjacking attacks</td>
+            <td><code>CWE-1021</code></td>
+            <td>Add 'X-Frame-Options: DENY' or 'SAMEORIGIN' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing DMARC Record</td>
+            <td>dns_enum</td>
+            <td>No DMARC record found — no email authentication enforcement</td>
+            <td><code>CWE-290</code></td>
+            <td>Add a DMARC TXT record at _dmarc.{domain}</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Risky service on port 21 (FTP)</td>
+            <td>port_scanner</td>
+            <td>FTP allows unencrypted file transfer</td>
+            <td><code>CWE-284</code></td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Risky service on port 21 (FTP)</td>
+            <td>port_scanner</td>
+            <td>FTP allows unencrypted file transfer</td>
+            <td><code>CWE-284</code></td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing Content-Security-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing CSP allows XSS and data injection attacks</td>
+            <td><code>CWE-79</code></td>
+            <td>Implement Content-Security-Policy header with strict directives</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing X-Frame-Options header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-Frame-Options allows clickjacking attacks</td>
+            <td><code>CWE-1021</code></td>
+            <td>Add 'X-Frame-Options: DENY' or 'SAMEORIGIN' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing Content-Security-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing CSP allows XSS and data injection attacks</td>
+            <td><code>CWE-79</code></td>
+            <td>Implement Content-Security-Policy header with strict directives</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing X-Frame-Options header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-Frame-Options allows clickjacking attacks</td>
+            <td><code>CWE-1021</code></td>
+            <td>Add 'X-Frame-Options: DENY' or 'SAMEORIGIN' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Risky service on port 21 (FTP)</td>
+            <td>port_scanner</td>
+            <td>FTP allows unencrypted file transfer</td>
+            <td><code>CWE-284</code></td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing SPF Record</td>
+            <td>dns_enum</td>
+            <td>No SPF record found — domain can be used for email spoofing</td>
+            <td><code>CWE-290</code></td>
+            <td>Add an SPF TXT record (e.g., 'v=spf1 include:_spf.google.com ~all')</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing DMARC Record</td>
+            <td>dns_enum</td>
+            <td>No DMARC record found — no email authentication enforcement</td>
+            <td><code>CWE-290</code></td>
+            <td>Add a DMARC TXT record at _dmarc.{domain}</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Risky service on port 21 (FTP)</td>
+            <td>port_scanner</td>
+            <td>FTP allows unencrypted file transfer</td>
+            <td><code>CWE-284</code></td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing Content-Security-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing CSP allows XSS and data injection attacks</td>
+            <td><code>CWE-79</code></td>
+            <td>Implement Content-Security-Policy header with strict directives</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Missing X-Frame-Options header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-Frame-Options allows clickjacking attacks</td>
+            <td><code>CWE-1021</code></td>
+            <td>Add 'X-Frame-Options: DENY' or 'SAMEORIGIN' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'url' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'url' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'redirect' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'redirect' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'next' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'next' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'return' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'return' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'returnTo' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'returnTo' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'goto' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'goto' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'target' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'target' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'rurl' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'rurl' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'url' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'url' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'redirect' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'redirect' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'next' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'next' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'return' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'return' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'returnTo' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'returnTo' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'goto' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'goto' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'target' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'target' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'rurl' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'rurl' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'url' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'url' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'redirect' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'redirect' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'next' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'next' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'return' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'return' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'returnTo' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'returnTo' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'goto' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'goto' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'target' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'target' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'rurl' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'rurl' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'url' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'url' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'redirect' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'redirect' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'next' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'next' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'return' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'return' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'returnTo' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'returnTo' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'goto' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'goto' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'target' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'target' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'rurl' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'rurl' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'url' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'url' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'redirect' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'redirect' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'next' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'next' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'return' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'return' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'returnTo' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'returnTo' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'goto' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'goto' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'target' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'target' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#ffd700">MEDIUM</span></td>
+            <td>Open Redirect via 'rurl' parameter</td>
+            <td>web_vuln_scanner</td>
+            <td>Server redirects to attacker-controlled URL via 'rurl' parameter</td>
+            <td><code>CWE-601</code></td>
+            <td>Validate redirect URLs against a whitelist of allowed domains.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing X-Content-Type-Options header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-Content-Type-Options allows MIME-type sniffing</td>
+            <td><code>CWE-16</code></td>
+            <td>Add 'X-Content-Type-Options: nosniff' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing X-XSS-Protection header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-XSS-Protection header (legacy but still useful)</td>
+            <td><code>CWE-79</code></td>
+            <td>Add 'X-XSS-Protection: 1; mode=block' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing Referrer-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing Referrer-Policy can leak sensitive URLs to third parties</td>
+            <td><code>CWE-200</code></td>
+            <td>Add 'Referrer-Policy: strict-origin-when-cross-origin' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing Permissions-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing Permissions-Policy allows unrestricted browser feature access</td>
+            <td><code>CWE-16</code></td>
+            <td>Add Permissions-Policy header to restrict browser features</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Information disclosure via Server header</td>
+            <td>header_analyzer</td>
+            <td>Server reveals technology info: Server: Apache/2.4.7 (Ubuntu)</td>
+            <td><code>CWE-200</code></td>
+            <td>Remove or suppress the 'Server' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing X-Content-Type-Options header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-Content-Type-Options allows MIME-type sniffing</td>
+            <td><code>CWE-16</code></td>
+            <td>Add 'X-Content-Type-Options: nosniff' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing X-XSS-Protection header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-XSS-Protection header (legacy but still useful)</td>
+            <td><code>CWE-79</code></td>
+            <td>Add 'X-XSS-Protection: 1; mode=block' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing Referrer-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing Referrer-Policy can leak sensitive URLs to third parties</td>
+            <td><code>CWE-200</code></td>
+            <td>Add 'Referrer-Policy: strict-origin-when-cross-origin' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing Permissions-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing Permissions-Policy allows unrestricted browser feature access</td>
+            <td><code>CWE-16</code></td>
+            <td>Add Permissions-Policy header to restrict browser features</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Information disclosure via Server header</td>
+            <td>header_analyzer</td>
+            <td>Server reveals technology info: Server: Apache/2.4.6 (CentOS)</td>
+            <td><code>CWE-200</code></td>
+            <td>Remove or suppress the 'Server' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing X-Content-Type-Options header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-Content-Type-Options allows MIME-type sniffing</td>
+            <td><code>CWE-16</code></td>
+            <td>Add 'X-Content-Type-Options: nosniff' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing X-XSS-Protection header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-XSS-Protection header (legacy but still useful)</td>
+            <td><code>CWE-79</code></td>
+            <td>Add 'X-XSS-Protection: 1; mode=block' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing Referrer-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing Referrer-Policy can leak sensitive URLs to third parties</td>
+            <td><code>CWE-200</code></td>
+            <td>Add 'Referrer-Policy: strict-origin-when-cross-origin' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing Permissions-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing Permissions-Policy allows unrestricted browser feature access</td>
+            <td><code>CWE-16</code></td>
+            <td>Add Permissions-Policy header to restrict browser features</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Information disclosure via Server header</td>
+            <td>header_analyzer</td>
+            <td>Server reveals technology info: Server: Apache/2.4.6 (CentOS)</td>
+            <td><code>CWE-200</code></td>
+            <td>Remove or suppress the 'Server' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing X-Content-Type-Options header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-Content-Type-Options allows MIME-type sniffing</td>
+            <td><code>CWE-16</code></td>
+            <td>Add 'X-Content-Type-Options: nosniff' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing X-XSS-Protection header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-XSS-Protection header (legacy but still useful)</td>
+            <td><code>CWE-79</code></td>
+            <td>Add 'X-XSS-Protection: 1; mode=block' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing Referrer-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing Referrer-Policy can leak sensitive URLs to third parties</td>
+            <td><code>CWE-200</code></td>
+            <td>Add 'Referrer-Policy: strict-origin-when-cross-origin' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing Permissions-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing Permissions-Policy allows unrestricted browser feature access</td>
+            <td><code>CWE-16</code></td>
+            <td>Add Permissions-Policy header to restrict browser features</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Information disclosure via Server header</td>
+            <td>header_analyzer</td>
+            <td>Server reveals technology info: Server: Apache/2.4.7 (Ubuntu)</td>
+            <td><code>CWE-200</code></td>
+            <td>Remove or suppress the 'Server' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Internal URLs exposed in JavaScript (3 found)</td>
+            <td>js_analyzer</td>
+            <td>Internal/private URLs found: https://localhost.twitter.com:8444, https://localhost.twitter.com, https://localhost.twitter.com:8445</td>
+            <td><code>CWE-200</code></td>
+            <td>Remove references to internal infrastructure from client-side code.</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing X-Content-Type-Options header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-Content-Type-Options allows MIME-type sniffing</td>
+            <td><code>CWE-16</code></td>
+            <td>Add 'X-Content-Type-Options: nosniff' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing X-XSS-Protection header</td>
+            <td>header_analyzer</td>
+            <td>Missing X-XSS-Protection header (legacy but still useful)</td>
+            <td><code>CWE-79</code></td>
+            <td>Add 'X-XSS-Protection: 1; mode=block' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing Referrer-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing Referrer-Policy can leak sensitive URLs to third parties</td>
+            <td><code>CWE-200</code></td>
+            <td>Add 'Referrer-Policy: strict-origin-when-cross-origin' header</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Missing Permissions-Policy header</td>
+            <td>header_analyzer</td>
+            <td>Missing Permissions-Policy allows unrestricted browser feature access</td>
+            <td><code>CWE-16</code></td>
+            <td>Add Permissions-Policy header to restrict browser features</td>
+        </tr>
+        <tr>
+            <td><span class="badge" style="background:#4fc3f7">LOW</span></td>
+            <td>Information disclosure via Server header</td>
+            <td>header_analyzer</td>
+            <td>Server reveals technology info: Server: Apache/2.4.7 (Ubuntu)</td>
+            <td><code>CWE-200</code></td>
+            <td>Remove or suppress the 'Server' header</td>
+        </tr></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Tool Results</h2>
+            <table>
+                <thead><tr><th>Tool</th><th>Status</th><th>Findings</th><th>Duration</th><th>Error</th></tr></thead>
+                <tbody>
+        <tr>
+            <td>subdomain_enum</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>crt.sh returned HTTP 502</td>
+        </tr>
+        <tr>
+            <td>subfinder_enum</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.1s</td>
+            <td>subfinder_enum requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>dns_enum</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>2</td>
+            <td>15.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>whois_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>2.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>port_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>10.4s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>nmap_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.3s</td>
+            <td>nmap_scan requires Docker sandbox mode (--sandbox or sandbox.enabled=true)</td>
+        </tr>
+        <tr>
+            <td>ssl_checker</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>3.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>tech_fingerprint</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>header_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>8</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_scraper</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>shodan_search</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.5s</td>
+            <td>SHODAN_API_KEY not set — skipping Shodan lookup</td>
+        </tr>
+        <tr>
+            <td>search_engine</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.9s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>search_engine</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.9s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>url_harvester</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>js_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.5s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>js_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.5s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>param_discovery</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>port_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>12.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>port_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>0.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>port_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.4s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>katana_crawl</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.4s</td>
+            <td>katana_crawl requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>httpx_probe</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.0s</td>
+            <td>httpx_probe requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>dns_enum</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>5.5s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>takeover_check</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>tech_fingerprint</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>tech_fingerprint</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>2.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssl_checker</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.1s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>header_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>7</td>
+            <td>2.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>search_engine</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>subdomain_enum</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.6s</td>
+            <td>crt.sh returned HTTP 502</td>
+        </tr>
+        <tr>
+            <td>subfinder_enum</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.4s</td>
+            <td>subfinder_enum requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>dns_enum</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>0.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>takeover_check</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>port_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>10.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>nmap_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.2s</td>
+            <td>nmap_scan requires Docker sandbox mode (--sandbox or sandbox.enabled=true)</td>
+        </tr>
+        <tr>
+            <td>port_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>2.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>tech_fingerprint</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>tech_fingerprint</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>header_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>7</td>
+            <td>1.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>header_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>8</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssl_checker</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>url_harvester</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>30.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>url_harvester</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>7.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>js_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>3.1s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>param_discovery</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_scraper</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.4s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>whois_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>2.1s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>shodan_search</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.5s</td>
+            <td>SHODAN_API_KEY not set — skipping Shodan lookup</td>
+        </tr>
+        <tr>
+            <td>search_engine</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>port_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>15.5s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>tech_fingerprint</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssl_checker</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>3.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>search_engine</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.2s</td>
+            <td>DuckDuckGo returned HTTP 202</td>
+        </tr>
+        <tr>
+            <td>web_scraper</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>param_discovery</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>js_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.1s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>url_harvester</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>14.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_scraper</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>subdomain_enum</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.7s</td>
+            <td>crt.sh returned HTTP 502</td>
+        </tr>
+        <tr>
+            <td>subfinder_enum</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.5s</td>
+            <td>subfinder_enum requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>dns_enum</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>2</td>
+            <td>10.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>whois_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>2.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>nmap_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.2s</td>
+            <td>nmap_scan requires Docker sandbox mode (--sandbox or sandbox.enabled=true)</td>
+        </tr>
+        <tr>
+            <td>port_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>2.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssl_checker</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>3.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>header_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>8</td>
+            <td>0.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>tech_fingerprint</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_scraper</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>url_harvester</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>30.4s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>url_harvester</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>3.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>js_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>js_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.1s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_scraper</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_scraper</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>param_discovery</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>shodan_search</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.5s</td>
+            <td>SHODAN_API_KEY not set — skipping Shodan lookup</td>
+        </tr>
+        <tr>
+            <td>search_engine</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.3s</td>
+            <td>DuckDuckGo returned HTTP 202</td>
+        </tr>
+        <tr>
+            <td>search_engine</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>katana_crawl</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.2s</td>
+            <td>katana_crawl requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>httpx_probe</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.0s</td>
+            <td>httpx_probe requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>js_analyzer</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>url_harvester</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>30.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>url_harvester</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>31.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_scraper</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_scraper</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_scraper</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>param_discovery</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>dir_bruteforce</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>dir_bruteforce</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>6.5s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>8</td>
+            <td>4.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cors_check</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>6.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssrf_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>16</td>
+            <td>7.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>host_header_injection</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>4</td>
+            <td>4.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>access_control_test</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>11.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>graphql_test</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>7.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>nuclei_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.1s</td>
+            <td>nuclei_scan requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>nikto_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.3s</td>
+            <td>nikto_scan requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>cve_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.9s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cve_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>sqlmap_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.3s</td>
+            <td>sqlmap_scan requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>ffuf_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.1s</td>
+            <td>ffuf_scan requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>idor_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>18.4s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssrf_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>4</td>
+            <td>2.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>host_header_injection</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>3</td>
+            <td>4.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cors_check</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>2.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cors_check</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>2.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cors_check</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>4.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cors_check</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>8.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>6.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>23.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>dir_bruteforce</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.5s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>dir_bruteforce</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>2.5s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cve_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cve_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ffuf_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.1s</td>
+            <td>ffuf_scan requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>host_header_injection</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>3</td>
+            <td>4.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>access_control_test</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>8.1s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>nuclei_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.2s</td>
+            <td>nuclei_scan requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>nikto_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.4s</td>
+            <td>nikto_scan requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>7.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>8</td>
+            <td>4.1s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssrf_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>1.4s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssrf_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>1.1s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssrf_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>1.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cors_check</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>8.1s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>access_control_test</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>13.4s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>6.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssrf_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>42.4s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cors_check</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>8.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>8</td>
+            <td>4.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssrf_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>1</td>
+            <td>1.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>8</td>
+            <td>4.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>8</td>
+            <td>4.5s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>idor_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>5.4s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>nuclei_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.5s</td>
+            <td>nuclei_scan requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>cve_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cve_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.7s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cve_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>dir_bruteforce</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.1s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cors_check</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>2.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>7.5s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>host_header_injection</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>3</td>
+            <td>5.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>access_control_test</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>8.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssrf_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>4</td>
+            <td>2.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>idor_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.3s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ffuf_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.3s</td>
+            <td>ffuf_scan requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>graphql_test</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>5.0s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>nikto_scan</td>
+            <td><span style="color:#ff4444">FAIL</span></td>
+            <td>0</td>
+            <td>0.2s</td>
+            <td>nikto_scan requires Docker sandbox mode</td>
+        </tr>
+        <tr>
+            <td>cors_check</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>4.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>web_vuln_scanner</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>26.5s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>ssrf_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>38.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>host_header_injection</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>4</td>
+            <td>10.4s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>dir_bruteforce</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>2.9s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>access_control_test</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>189.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>graphql_test</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>77.2s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>idor_detector</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.4s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cve_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>1.6s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cve_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>cve_lookup</td>
+            <td><span style="color:#81c784">OK</span></td>
+            <td>0</td>
+            <td>0.8s</td>
+            <td>-</td>
+        </tr></tbody>
+            </table>
+        </div>
+
+        <div class='section'><h2>Remediation Steps</h2><ol><li>{'priority': 'Immediate (24-48 hours)', 'actions': ['1. Enable HTTPS on scanme.nmap.org with proper SSL/TLS configuration', '2. Fix password reset poisoning by removing Host header dependency', '3. Implement SSRF protections with internal IP blocking', '4. Disable or secure FTP service (port 21)']}</li>
+<li>{'priority': 'Short-term (1 week)', 'actions': ['1. Implement comprehensive security headers across all domains', '2. Fix open redirect vulnerabilities with URL validation', '3. Add SPF and DMARC records for email authentication', '4. Conduct code review for all user input handling']}</li>
+<li>{'priority': 'Long-term (1 month)', 'actions': ['1. Implement Web Application Firewall (WAF) rules', '2. Conduct penetration testing of all subdomains', '3. Implement security monitoring and alerting', '4. Establish bug bounty program for continuous testing']}</li>
+</ol></div>
+
+        <div class="footer">
+            Generated by VulnHunter v1.0.0 — Autonomous AI Penetration Testing Platform
+        </div>
+    </div>
+</body>
+</html>

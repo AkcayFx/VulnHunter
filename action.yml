@@ -1,0 +1,81 @@
+name: "VulnHunter Security Scan"
+description: "Run VulnHunter autonomous AI penetration test against your staging environment"
+branding:
+  icon: "shield"
+  color: "red"
+
+inputs:
+  target:
+    description: "Target URL or domain to scan"
+    required: true
+  scope-file:
+    description: "Path to scope YAML file"
+    required: false
+    default: ""
+  fail-on:
+    description: "Minimum severity to fail the check: low, medium, high, critical"
+    required: false
+    default: "high"
+  output:
+    description: "Output file path for results (JSON)"
+    required: false
+    default: "vulnhunter-results.json"
+  sarif-output:
+    description: "Output SARIF file path for GitHub Security tab"
+    required: false
+    default: "vulnhunter-results.sarif"
+  lightweight:
+    description: "Run in lightweight mode (Python-native tools only, no Docker)"
+    required: false
+    default: "true"
+  deepseek-api-key:
+    description: "DeepSeek API key for AI analysis"
+    required: false
+    default: ""
+
+outputs:
+  risk-score:
+    description: "Overall risk score (0-10)"
+  threat-level:
+    description: "Threat level (Informational, Low, Medium, High, Critical)"
+  total-vulns:
+    description: "Total number of vulnerabilities found"
+  sarif-file:
+    description: "Path to SARIF output file"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+
+    - name: Install VulnHunter
+      shell: bash
+      run: |
+        pip install -e .
+      working-directory: ${{ github.action_path }}
+
+    - name: Run VulnHunter Scan
+      shell: bash
+      env:
+        DEEPSEEK_API_KEY: ${{ inputs.deepseek-api-key }}
+      run: |
+        ARGS="${{ inputs.target }} --ci --fail-on ${{ inputs.fail-on }} --output ${{ inputs.output }}"
+        if [ -n "${{ inputs.scope-file }}" ]; then
+          ARGS="$ARGS --scope ${{ inputs.scope-file }}"
+        fi
+        if [ "${{ inputs.lightweight }}" = "true" ]; then
+          ARGS="$ARGS --lightweight"
+        fi
+        if [ -n "${{ inputs.sarif-output }}" ]; then
+          ARGS="$ARGS --sarif ${{ inputs.sarif-output }}"
+        fi
+        vulnhunter scan $ARGS
+
+    - name: Upload SARIF to GitHub Security
+      if: always() && inputs.sarif-output != ''
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ${{ inputs.sarif-output }}

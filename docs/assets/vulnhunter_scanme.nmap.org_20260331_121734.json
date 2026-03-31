@@ -1,0 +1,2552 @@
+{
+  "vulnhunter_version": "1.0.0",
+  "target": "scanme.nmap.org",
+  "timestamp": "2026-03-31T12:17:34.806035",
+  "risk_score": 8.2,
+  "threat_level": "High",
+  "executive_summary": "Security assessment of scanme.nmap.org and nmap.org infrastructure revealed multiple critical vulnerabilities including password reset token theft, server-side request forgery allowing internal network access, and widespread open redirects. The absence of HTTPS on scanme.nmap.org and unencrypted FTP services further expose the infrastructure to data interception and credential theft.",
+  "total_duration_seconds": 2068.09,
+  "vulnerabilities": [
+    {
+      "title": "Missing SPF Record",
+      "severity": "medium",
+      "tool": "dns_enum",
+      "description": "No SPF record found — domain can be used for email spoofing",
+      "evidence": "No TXT record with 'v=spf1' found for scanme.nmap.org",
+      "cwe_id": "CWE-290",
+      "cvss_score": 6.5,
+      "remediation": "Add an SPF TXT record (e.g., 'v=spf1 include:_spf.google.com ~all')"
+    },
+    {
+      "title": "Missing DMARC Record",
+      "severity": "medium",
+      "tool": "dns_enum",
+      "description": "No DMARC record found — no email authentication enforcement",
+      "evidence": "No TXT record at _dmarc.scanme.nmap.org",
+      "cwe_id": "CWE-290",
+      "cvss_score": 10.0,
+      "remediation": "Add a DMARC TXT record at _dmarc.{domain}"
+    },
+    {
+      "title": "Risky service on port 21 (FTP)",
+      "severity": "medium",
+      "tool": "port_scanner",
+      "description": "FTP allows unencrypted file transfer",
+      "evidence": "Port 21 is open on scanme.nmap.org (45.33.32.156)",
+      "cwe_id": "CWE-284",
+      "cvss_score": 6.5,
+      "remediation": ""
+    },
+    {
+      "title": "No HTTPS / SSL Not Available",
+      "severity": "high",
+      "tool": "ssl_checker",
+      "description": "Port 443 is closed or not serving SSL/TLS on scanme.nmap.org",
+      "evidence": "[WinError 10061] No connection could be made because the target machine actively refused it",
+      "cwe_id": "CWE-319",
+      "cvss_score": 6.5,
+      "remediation": "Deploy a TLS certificate and redirect all HTTP traffic to HTTPS"
+    },
+    {
+      "title": "Missing Strict-Transport-Security header",
+      "severity": "high",
+      "tool": "header_analyzer",
+      "description": "Missing HSTS header allows downgrade attacks and cookie hijacking",
+      "evidence": "Header 'Strict-Transport-Security' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-319",
+      "cvss_score": 6.5,
+      "remediation": "Add 'Strict-Transport-Security: max-age=31536000; includeSubDomains' header"
+    },
+    {
+      "title": "Missing Content-Security-Policy header",
+      "severity": "medium",
+      "tool": "header_analyzer",
+      "description": "Missing CSP allows XSS and data injection attacks",
+      "evidence": "Header 'Content-Security-Policy' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-79",
+      "cvss_score": 5.4,
+      "remediation": "Implement Content-Security-Policy header with strict directives"
+    },
+    {
+      "title": "Missing X-Frame-Options header",
+      "severity": "medium",
+      "tool": "header_analyzer",
+      "description": "Missing X-Frame-Options allows clickjacking attacks",
+      "evidence": "Header 'X-Frame-Options' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-1021",
+      "cvss_score": 6.5,
+      "remediation": "Add 'X-Frame-Options: DENY' or 'SAMEORIGIN' header"
+    },
+    {
+      "title": "Missing X-Content-Type-Options header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing X-Content-Type-Options allows MIME-type sniffing",
+      "evidence": "Header 'X-Content-Type-Options' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-16",
+      "cvss_score": 6.5,
+      "remediation": "Add 'X-Content-Type-Options: nosniff' header"
+    },
+    {
+      "title": "Missing X-XSS-Protection header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing X-XSS-Protection header (legacy but still useful)",
+      "evidence": "Header 'X-XSS-Protection' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-79",
+      "cvss_score": 5.4,
+      "remediation": "Add 'X-XSS-Protection: 1; mode=block' header"
+    },
+    {
+      "title": "Missing Referrer-Policy header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing Referrer-Policy can leak sensitive URLs to third parties",
+      "evidence": "Header 'Referrer-Policy' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-200",
+      "cvss_score": 6.5,
+      "remediation": "Add 'Referrer-Policy: strict-origin-when-cross-origin' header"
+    },
+    {
+      "title": "Missing Permissions-Policy header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing Permissions-Policy allows unrestricted browser feature access",
+      "evidence": "Header 'Permissions-Policy' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-16",
+      "cvss_score": 6.5,
+      "remediation": "Add Permissions-Policy header to restrict browser features"
+    },
+    {
+      "title": "Information disclosure via Server header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Server reveals technology info: Server: Apache/2.4.7 (Ubuntu)",
+      "evidence": "Server: Apache/2.4.7 (Ubuntu)",
+      "cwe_id": "CWE-200",
+      "cvss_score": 5.3,
+      "remediation": "Remove or suppress the 'Server' header"
+    },
+    {
+      "title": "Risky service on port 21 (FTP)",
+      "severity": "medium",
+      "tool": "port_scanner",
+      "description": "FTP allows unencrypted file transfer",
+      "evidence": "Port 21 is open on 45.33.32.156 (45.33.32.156)",
+      "cwe_id": "CWE-284",
+      "cvss_score": 6.5,
+      "remediation": ""
+    },
+    {
+      "title": "Missing DMARC Record",
+      "severity": "medium",
+      "tool": "dns_enum",
+      "description": "No DMARC record found — no email authentication enforcement",
+      "evidence": "No TXT record at _dmarc.nmap.org",
+      "cwe_id": "CWE-290",
+      "cvss_score": 10.0,
+      "remediation": "Add a DMARC TXT record at _dmarc.{domain}"
+    },
+    {
+      "title": "Missing Content-Security-Policy header",
+      "severity": "medium",
+      "tool": "header_analyzer",
+      "description": "Missing CSP allows XSS and data injection attacks",
+      "evidence": "Header 'Content-Security-Policy' not found in response from http://nmap.org",
+      "cwe_id": "CWE-79",
+      "cvss_score": 5.4,
+      "remediation": "Implement Content-Security-Policy header with strict directives"
+    },
+    {
+      "title": "Missing X-Frame-Options header",
+      "severity": "medium",
+      "tool": "header_analyzer",
+      "description": "Missing X-Frame-Options allows clickjacking attacks",
+      "evidence": "Header 'X-Frame-Options' not found in response from http://nmap.org",
+      "cwe_id": "CWE-1021",
+      "cvss_score": 6.5,
+      "remediation": "Add 'X-Frame-Options: DENY' or 'SAMEORIGIN' header"
+    },
+    {
+      "title": "Missing X-Content-Type-Options header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing X-Content-Type-Options allows MIME-type sniffing",
+      "evidence": "Header 'X-Content-Type-Options' not found in response from http://nmap.org",
+      "cwe_id": "CWE-16",
+      "cvss_score": 6.5,
+      "remediation": "Add 'X-Content-Type-Options: nosniff' header"
+    },
+    {
+      "title": "Missing X-XSS-Protection header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing X-XSS-Protection header (legacy but still useful)",
+      "evidence": "Header 'X-XSS-Protection' not found in response from http://nmap.org",
+      "cwe_id": "CWE-79",
+      "cvss_score": 5.4,
+      "remediation": "Add 'X-XSS-Protection: 1; mode=block' header"
+    },
+    {
+      "title": "Missing Referrer-Policy header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing Referrer-Policy can leak sensitive URLs to third parties",
+      "evidence": "Header 'Referrer-Policy' not found in response from http://nmap.org",
+      "cwe_id": "CWE-200",
+      "cvss_score": 6.5,
+      "remediation": "Add 'Referrer-Policy: strict-origin-when-cross-origin' header"
+    },
+    {
+      "title": "Missing Permissions-Policy header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing Permissions-Policy allows unrestricted browser feature access",
+      "evidence": "Header 'Permissions-Policy' not found in response from http://nmap.org",
+      "cwe_id": "CWE-16",
+      "cvss_score": 6.5,
+      "remediation": "Add Permissions-Policy header to restrict browser features"
+    },
+    {
+      "title": "Information disclosure via Server header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Server reveals technology info: Server: Apache/2.4.6 (CentOS)",
+      "evidence": "Server: Apache/2.4.6 (CentOS)",
+      "cwe_id": "CWE-200",
+      "cvss_score": 5.3,
+      "remediation": "Remove or suppress the 'Server' header"
+    },
+    {
+      "title": "Missing DMARC Record",
+      "severity": "medium",
+      "tool": "dns_enum",
+      "description": "No DMARC record found — no email authentication enforcement",
+      "evidence": "No TXT record at _dmarc.nmap.org",
+      "cwe_id": "CWE-290",
+      "cvss_score": 10.0,
+      "remediation": "Add a DMARC TXT record at _dmarc.{domain}"
+    },
+    {
+      "title": "Risky service on port 21 (FTP)",
+      "severity": "medium",
+      "tool": "port_scanner",
+      "description": "FTP allows unencrypted file transfer",
+      "evidence": "Port 21 is open on scanme.nmap.org (45.33.32.156)",
+      "cwe_id": "CWE-284",
+      "cvss_score": 6.5,
+      "remediation": ""
+    },
+    {
+      "title": "Risky service on port 21 (FTP)",
+      "severity": "medium",
+      "tool": "port_scanner",
+      "description": "FTP allows unencrypted file transfer",
+      "evidence": "Port 21 is open on nmap.org (50.116.1.184)",
+      "cwe_id": "CWE-284",
+      "cvss_score": 6.5,
+      "remediation": ""
+    },
+    {
+      "title": "Missing Content-Security-Policy header",
+      "severity": "medium",
+      "tool": "header_analyzer",
+      "description": "Missing CSP allows XSS and data injection attacks",
+      "evidence": "Header 'Content-Security-Policy' not found in response from https://nmap.org",
+      "cwe_id": "CWE-79",
+      "cvss_score": 5.4,
+      "remediation": "Implement Content-Security-Policy header with strict directives"
+    },
+    {
+      "title": "Missing X-Frame-Options header",
+      "severity": "medium",
+      "tool": "header_analyzer",
+      "description": "Missing X-Frame-Options allows clickjacking attacks",
+      "evidence": "Header 'X-Frame-Options' not found in response from https://nmap.org",
+      "cwe_id": "CWE-1021",
+      "cvss_score": 6.5,
+      "remediation": "Add 'X-Frame-Options: DENY' or 'SAMEORIGIN' header"
+    },
+    {
+      "title": "Missing X-Content-Type-Options header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing X-Content-Type-Options allows MIME-type sniffing",
+      "evidence": "Header 'X-Content-Type-Options' not found in response from https://nmap.org",
+      "cwe_id": "CWE-16",
+      "cvss_score": 6.5,
+      "remediation": "Add 'X-Content-Type-Options: nosniff' header"
+    },
+    {
+      "title": "Missing X-XSS-Protection header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing X-XSS-Protection header (legacy but still useful)",
+      "evidence": "Header 'X-XSS-Protection' not found in response from https://nmap.org",
+      "cwe_id": "CWE-79",
+      "cvss_score": 5.4,
+      "remediation": "Add 'X-XSS-Protection: 1; mode=block' header"
+    },
+    {
+      "title": "Missing Referrer-Policy header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing Referrer-Policy can leak sensitive URLs to third parties",
+      "evidence": "Header 'Referrer-Policy' not found in response from https://nmap.org",
+      "cwe_id": "CWE-200",
+      "cvss_score": 6.5,
+      "remediation": "Add 'Referrer-Policy: strict-origin-when-cross-origin' header"
+    },
+    {
+      "title": "Missing Permissions-Policy header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing Permissions-Policy allows unrestricted browser feature access",
+      "evidence": "Header 'Permissions-Policy' not found in response from https://nmap.org",
+      "cwe_id": "CWE-16",
+      "cvss_score": 6.5,
+      "remediation": "Add Permissions-Policy header to restrict browser features"
+    },
+    {
+      "title": "Information disclosure via Server header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Server reveals technology info: Server: Apache/2.4.6 (CentOS)",
+      "evidence": "Server: Apache/2.4.6 (CentOS)",
+      "cwe_id": "CWE-200",
+      "cvss_score": 5.3,
+      "remediation": "Remove or suppress the 'Server' header"
+    },
+    {
+      "title": "Missing Strict-Transport-Security header",
+      "severity": "high",
+      "tool": "header_analyzer",
+      "description": "Missing HSTS header allows downgrade attacks and cookie hijacking",
+      "evidence": "Header 'Strict-Transport-Security' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-319",
+      "cvss_score": 6.5,
+      "remediation": "Add 'Strict-Transport-Security: max-age=31536000; includeSubDomains' header"
+    },
+    {
+      "title": "Missing Content-Security-Policy header",
+      "severity": "medium",
+      "tool": "header_analyzer",
+      "description": "Missing CSP allows XSS and data injection attacks",
+      "evidence": "Header 'Content-Security-Policy' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-79",
+      "cvss_score": 5.4,
+      "remediation": "Implement Content-Security-Policy header with strict directives"
+    },
+    {
+      "title": "Missing X-Frame-Options header",
+      "severity": "medium",
+      "tool": "header_analyzer",
+      "description": "Missing X-Frame-Options allows clickjacking attacks",
+      "evidence": "Header 'X-Frame-Options' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-1021",
+      "cvss_score": 6.5,
+      "remediation": "Add 'X-Frame-Options: DENY' or 'SAMEORIGIN' header"
+    },
+    {
+      "title": "Missing X-Content-Type-Options header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing X-Content-Type-Options allows MIME-type sniffing",
+      "evidence": "Header 'X-Content-Type-Options' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-16",
+      "cvss_score": 6.5,
+      "remediation": "Add 'X-Content-Type-Options: nosniff' header"
+    },
+    {
+      "title": "Missing X-XSS-Protection header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing X-XSS-Protection header (legacy but still useful)",
+      "evidence": "Header 'X-XSS-Protection' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-79",
+      "cvss_score": 5.4,
+      "remediation": "Add 'X-XSS-Protection: 1; mode=block' header"
+    },
+    {
+      "title": "Missing Referrer-Policy header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing Referrer-Policy can leak sensitive URLs to third parties",
+      "evidence": "Header 'Referrer-Policy' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-200",
+      "cvss_score": 6.5,
+      "remediation": "Add 'Referrer-Policy: strict-origin-when-cross-origin' header"
+    },
+    {
+      "title": "Missing Permissions-Policy header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing Permissions-Policy allows unrestricted browser feature access",
+      "evidence": "Header 'Permissions-Policy' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-16",
+      "cvss_score": 6.5,
+      "remediation": "Add Permissions-Policy header to restrict browser features"
+    },
+    {
+      "title": "Information disclosure via Server header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Server reveals technology info: Server: Apache/2.4.7 (Ubuntu)",
+      "evidence": "Server: Apache/2.4.7 (Ubuntu)",
+      "cwe_id": "CWE-200",
+      "cvss_score": 5.3,
+      "remediation": "Remove or suppress the 'Server' header"
+    },
+    {
+      "title": "Internal URLs exposed in JavaScript (3 found)",
+      "severity": "low",
+      "tool": "js_analyzer",
+      "description": "Internal/private URLs found: https://localhost.twitter.com:8444, https://localhost.twitter.com, https://localhost.twitter.com:8445",
+      "evidence": "https://localhost.twitter.com:8444\nhttps://localhost.twitter.com\nhttps://localhost.twitter.com:8445",
+      "cwe_id": "CWE-200",
+      "cvss_score": 6.5,
+      "remediation": "Remove references to internal infrastructure from client-side code."
+    },
+    {
+      "title": "Risky service on port 21 (FTP)",
+      "severity": "medium",
+      "tool": "port_scanner",
+      "description": "FTP allows unencrypted file transfer",
+      "evidence": "Port 21 is open on scanme.nmap.org (45.33.32.156)",
+      "cwe_id": "CWE-284",
+      "cvss_score": 6.5,
+      "remediation": ""
+    },
+    {
+      "title": "No HTTPS / SSL Not Available",
+      "severity": "high",
+      "tool": "ssl_checker",
+      "description": "Port 443 is closed or not serving SSL/TLS on scanme.nmap.org",
+      "evidence": "[WinError 10061] No connection could be made because the target machine actively refused it",
+      "cwe_id": "CWE-319",
+      "cvss_score": 6.5,
+      "remediation": "Deploy a TLS certificate and redirect all HTTP traffic to HTTPS"
+    },
+    {
+      "title": "Missing SPF Record",
+      "severity": "medium",
+      "tool": "dns_enum",
+      "description": "No SPF record found — domain can be used for email spoofing",
+      "evidence": "No TXT record with 'v=spf1' found for scanme.nmap.org",
+      "cwe_id": "CWE-290",
+      "cvss_score": 6.5,
+      "remediation": "Add an SPF TXT record (e.g., 'v=spf1 include:_spf.google.com ~all')"
+    },
+    {
+      "title": "Missing DMARC Record",
+      "severity": "medium",
+      "tool": "dns_enum",
+      "description": "No DMARC record found — no email authentication enforcement",
+      "evidence": "No TXT record at _dmarc.scanme.nmap.org",
+      "cwe_id": "CWE-290",
+      "cvss_score": 10.0,
+      "remediation": "Add a DMARC TXT record at _dmarc.{domain}"
+    },
+    {
+      "title": "Risky service on port 21 (FTP)",
+      "severity": "medium",
+      "tool": "port_scanner",
+      "description": "FTP allows unencrypted file transfer",
+      "evidence": "Port 21 is open on scanme.nmap.org (45.33.32.156)",
+      "cwe_id": "CWE-284",
+      "cvss_score": 6.5,
+      "remediation": ""
+    },
+    {
+      "title": "No HTTPS / SSL Not Available",
+      "severity": "high",
+      "tool": "ssl_checker",
+      "description": "Port 443 is closed or not serving SSL/TLS on scanme.nmap.org",
+      "evidence": "[WinError 10061] No connection could be made because the target machine actively refused it",
+      "cwe_id": "CWE-319",
+      "cvss_score": 6.5,
+      "remediation": "Deploy a TLS certificate and redirect all HTTP traffic to HTTPS"
+    },
+    {
+      "title": "Missing Strict-Transport-Security header",
+      "severity": "high",
+      "tool": "header_analyzer",
+      "description": "Missing HSTS header allows downgrade attacks and cookie hijacking",
+      "evidence": "Header 'Strict-Transport-Security' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-319",
+      "cvss_score": 6.5,
+      "remediation": "Add 'Strict-Transport-Security: max-age=31536000; includeSubDomains' header"
+    },
+    {
+      "title": "Missing Content-Security-Policy header",
+      "severity": "medium",
+      "tool": "header_analyzer",
+      "description": "Missing CSP allows XSS and data injection attacks",
+      "evidence": "Header 'Content-Security-Policy' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-79",
+      "cvss_score": 5.4,
+      "remediation": "Implement Content-Security-Policy header with strict directives"
+    },
+    {
+      "title": "Missing X-Frame-Options header",
+      "severity": "medium",
+      "tool": "header_analyzer",
+      "description": "Missing X-Frame-Options allows clickjacking attacks",
+      "evidence": "Header 'X-Frame-Options' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-1021",
+      "cvss_score": 6.5,
+      "remediation": "Add 'X-Frame-Options: DENY' or 'SAMEORIGIN' header"
+    },
+    {
+      "title": "Missing X-Content-Type-Options header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing X-Content-Type-Options allows MIME-type sniffing",
+      "evidence": "Header 'X-Content-Type-Options' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-16",
+      "cvss_score": 6.5,
+      "remediation": "Add 'X-Content-Type-Options: nosniff' header"
+    },
+    {
+      "title": "Missing X-XSS-Protection header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing X-XSS-Protection header (legacy but still useful)",
+      "evidence": "Header 'X-XSS-Protection' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-79",
+      "cvss_score": 5.4,
+      "remediation": "Add 'X-XSS-Protection: 1; mode=block' header"
+    },
+    {
+      "title": "Missing Referrer-Policy header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing Referrer-Policy can leak sensitive URLs to third parties",
+      "evidence": "Header 'Referrer-Policy' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-200",
+      "cvss_score": 6.5,
+      "remediation": "Add 'Referrer-Policy: strict-origin-when-cross-origin' header"
+    },
+    {
+      "title": "Missing Permissions-Policy header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Missing Permissions-Policy allows unrestricted browser feature access",
+      "evidence": "Header 'Permissions-Policy' not found in response from http://scanme.nmap.org",
+      "cwe_id": "CWE-16",
+      "cvss_score": 6.5,
+      "remediation": "Add Permissions-Policy header to restrict browser features"
+    },
+    {
+      "title": "Information disclosure via Server header",
+      "severity": "low",
+      "tool": "header_analyzer",
+      "description": "Server reveals technology info: Server: Apache/2.4.7 (Ubuntu)",
+      "evidence": "Server: Apache/2.4.7 (Ubuntu)",
+      "cwe_id": "CWE-200",
+      "cvss_score": 5.3,
+      "remediation": "Remove or suppress the 'Server' header"
+    },
+    {
+      "title": "Open Redirect via 'url' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'url' parameter",
+      "evidence": "Redirect to: https://nmap.org/?url=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'redirect' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'redirect' parameter",
+      "evidence": "Redirect to: https://nmap.org/?redirect=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'next' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'next' parameter",
+      "evidence": "Redirect to: https://nmap.org/?next=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'return' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'return' parameter",
+      "evidence": "Redirect to: https://nmap.org/?return=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'returnTo' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'returnTo' parameter",
+      "evidence": "Redirect to: https://nmap.org/?returnTo=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'goto' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'goto' parameter",
+      "evidence": "Redirect to: https://nmap.org/?goto=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'target' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'target' parameter",
+      "evidence": "Redirect to: https://nmap.org/?target=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'rurl' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'rurl' parameter",
+      "evidence": "Redirect to: https://nmap.org/?rurl=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "SSRF via 'url' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org\nParameter: url\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'link' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org\nParameter: link\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'src' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org\nParameter: src\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'callback' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org\nParameter: callback\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'url' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api\nParameter: url\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'link' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api\nParameter: link\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'src' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api\nParameter: src\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'callback' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api\nParameter: callback\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'url' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api/v1\nParameter: url\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'link' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api/v1\nParameter: link\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'src' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api/v1\nParameter: src\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'callback' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api/v1\nParameter: callback\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'url' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api/v2\nParameter: url\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'link' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api/v2\nParameter: link\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'src' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api/v2\nParameter: src\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'callback' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.",
+      "evidence": "URL: http://nmap.org/api/v2\nParameter: callback\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "Host Header Injection: Host Override",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using Host Override. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: Host Override\nURL: http://nmap.org\nIndicator: Evil host 'evil.vulnhunter-test.com' reflected in response body",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Host Header Injection: X-Original-URL",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Original-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: X-Original-URL\nURL: http://nmap.org\nIndicator: Path override returned status 301 (expected 404)",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Host Header Injection: X-Rewrite-URL",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Rewrite-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: X-Rewrite-URL\nURL: http://nmap.org\nIndicator: Path override returned status 301 (expected 404)",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Password Reset Poisoning via Host Header",
+      "severity": "critical",
+      "tool": "host_header_injection",
+      "description": "Password reset endpoint http://nmap.org/reset-password uses the Host header to generate the reset link. An attacker can poison the Host to steal reset tokens.",
+      "evidence": "URL: http://nmap.org/reset-password\nInjected Host: evil.vulnhunter-test.com\nIndicator: Reset page reflects poisoned host 'evil.vulnhunter-test.com'",
+      "cwe_id": "CWE-644",
+      "cvss_score": 6.5,
+      "remediation": "Use a hardcoded base URL for password reset links, not the Host header."
+    },
+    {
+      "title": "SSRF via 'url' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.",
+      "evidence": "URL: http://scanme.nmap.org\nParameter: url\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'welcome to'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'link' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.",
+      "evidence": "URL: http://scanme.nmap.org\nParameter: link\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'welcome to'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'src' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.",
+      "evidence": "URL: http://scanme.nmap.org\nParameter: src\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'welcome to'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'callback' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.",
+      "evidence": "URL: http://scanme.nmap.org\nParameter: callback\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'welcome to'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "Host Header Injection: X-Original-URL",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Original-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: X-Original-URL\nURL: http://scanme.nmap.org\nIndicator: Path override returned status 200 (expected 404)",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Host Header Injection: X-Rewrite-URL",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Rewrite-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: X-Rewrite-URL\nURL: http://scanme.nmap.org\nIndicator: Path override returned status 200 (expected 404)",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Password Reset Poisoning via Host Header",
+      "severity": "critical",
+      "tool": "host_header_injection",
+      "description": "Password reset endpoint http://scanme.nmap.org/reset-password uses the Host header to generate the reset link. An attacker can poison the Host to steal reset tokens.",
+      "evidence": "URL: http://scanme.nmap.org/reset-password\nInjected Host: evil.vulnhunter-test.com\nIndicator: Reset page reflects poisoned host 'evil.vulnhunter-test.com'",
+      "cwe_id": "CWE-644",
+      "cvss_score": 6.5,
+      "remediation": "Use a hardcoded base URL for password reset links, not the Host header."
+    },
+    {
+      "title": "Host Header Injection: X-Original-URL",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Original-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: X-Original-URL\nURL: http://scanme.nmap.org\nIndicator: Path override returned status 200 (expected 404)",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Host Header Injection: X-Rewrite-URL",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Rewrite-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: X-Rewrite-URL\nURL: http://scanme.nmap.org\nIndicator: Path override returned status 200 (expected 404)",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Password Reset Poisoning via Host Header",
+      "severity": "critical",
+      "tool": "host_header_injection",
+      "description": "Password reset endpoint http://scanme.nmap.org/reset-password uses the Host header to generate the reset link. An attacker can poison the Host to steal reset tokens.",
+      "evidence": "URL: http://scanme.nmap.org/reset-password\nInjected Host: evil.vulnhunter-test.com\nIndicator: Reset page reflects poisoned host 'evil.vulnhunter-test.com'",
+      "cwe_id": "CWE-644",
+      "cvss_score": 6.5,
+      "remediation": "Use a hardcoded base URL for password reset links, not the Host header."
+    },
+    {
+      "title": "Open Redirect via 'url' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'url' parameter",
+      "evidence": "Redirect to: https://nmap.org/?url=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'redirect' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'redirect' parameter",
+      "evidence": "Redirect to: https://nmap.org/?redirect=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'next' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'next' parameter",
+      "evidence": "Redirect to: https://nmap.org/?next=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'return' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'return' parameter",
+      "evidence": "Redirect to: https://nmap.org/?return=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'returnTo' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'returnTo' parameter",
+      "evidence": "Redirect to: https://nmap.org/?returnTo=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'goto' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'goto' parameter",
+      "evidence": "Redirect to: https://nmap.org/?goto=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'target' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'target' parameter",
+      "evidence": "Redirect to: https://nmap.org/?target=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'rurl' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'rurl' parameter",
+      "evidence": "Redirect to: https://nmap.org/?rurl=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "SSRF via 'url' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.",
+      "evidence": "URL: https://admin.nmap.org\nParameter: url\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'redirect' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'redirect'. The server made a request to http://127.0.0.1 when injected via 'redirect'. Type: localhost IPv4.",
+      "evidence": "URL: https://admin.nmap.org\nParameter: redirect\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'next' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'next'. The server made a request to http://127.0.0.1 when injected via 'next'. Type: localhost IPv4.",
+      "evidence": "URL: https://admin.nmap.org\nParameter: next\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "Open Redirect via 'url' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'url' parameter",
+      "evidence": "Redirect to: https://nmap.org/?url=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'redirect' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'redirect' parameter",
+      "evidence": "Redirect to: https://nmap.org/?redirect=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'next' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'next' parameter",
+      "evidence": "Redirect to: https://nmap.org/?next=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'return' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'return' parameter",
+      "evidence": "Redirect to: https://nmap.org/?return=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'returnTo' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'returnTo' parameter",
+      "evidence": "Redirect to: https://nmap.org/?returnTo=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'goto' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'goto' parameter",
+      "evidence": "Redirect to: https://nmap.org/?goto=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'target' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'target' parameter",
+      "evidence": "Redirect to: https://nmap.org/?target=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'rurl' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'rurl' parameter",
+      "evidence": "Redirect to: https://nmap.org/?rurl=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "SSRF via 'url' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.",
+      "evidence": "URL: https://api.nmap.org\nParameter: url\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'apache'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "Open Redirect via 'url' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'url' parameter",
+      "evidence": "Redirect to: https://nmap.org/?url=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'redirect' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'redirect' parameter",
+      "evidence": "Redirect to: https://nmap.org/?redirect=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'next' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'next' parameter",
+      "evidence": "Redirect to: https://nmap.org/?next=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'return' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'return' parameter",
+      "evidence": "Redirect to: https://nmap.org/?return=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'returnTo' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'returnTo' parameter",
+      "evidence": "Redirect to: https://nmap.org/?returnTo=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'goto' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'goto' parameter",
+      "evidence": "Redirect to: https://nmap.org/?goto=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'target' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'target' parameter",
+      "evidence": "Redirect to: https://nmap.org/?target=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'rurl' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'rurl' parameter",
+      "evidence": "Redirect to: https://nmap.org/?rurl=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'url' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'url' parameter",
+      "evidence": "Redirect to: https://nmap.org/?url=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'redirect' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'redirect' parameter",
+      "evidence": "Redirect to: https://nmap.org/?redirect=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'next' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'next' parameter",
+      "evidence": "Redirect to: https://nmap.org/?next=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'return' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'return' parameter",
+      "evidence": "Redirect to: https://nmap.org/?return=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'returnTo' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'returnTo' parameter",
+      "evidence": "Redirect to: https://nmap.org/?returnTo=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'goto' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'goto' parameter",
+      "evidence": "Redirect to: https://nmap.org/?goto=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'target' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'target' parameter",
+      "evidence": "Redirect to: https://nmap.org/?target=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Open Redirect via 'rurl' parameter",
+      "severity": "medium",
+      "tool": "web_vuln_scanner",
+      "description": "Server redirects to attacker-controlled URL via 'rurl' parameter",
+      "evidence": "Redirect to: https://nmap.org/?rurl=//evil.com",
+      "cwe_id": "CWE-601",
+      "cvss_score": 6.5,
+      "remediation": "Validate redirect URLs against a whitelist of allowed domains."
+    },
+    {
+      "title": "Host Header Injection: X-Original-URL",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Original-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: X-Original-URL\nURL: http://scanme.nmap.org\nIndicator: Path override returned status 200 (expected 404)",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Host Header Injection: X-Rewrite-URL",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Rewrite-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: X-Rewrite-URL\nURL: http://scanme.nmap.org\nIndicator: Path override returned status 200 (expected 404)",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Password Reset Poisoning via Host Header",
+      "severity": "critical",
+      "tool": "host_header_injection",
+      "description": "Password reset endpoint http://scanme.nmap.org/reset-password uses the Host header to generate the reset link. An attacker can poison the Host to steal reset tokens.",
+      "evidence": "URL: http://scanme.nmap.org/reset-password\nInjected Host: evil.vulnhunter-test.com\nIndicator: Reset page reflects poisoned host 'evil.vulnhunter-test.com'",
+      "cwe_id": "CWE-644",
+      "cvss_score": 6.5,
+      "remediation": "Use a hardcoded base URL for password reset links, not the Host header."
+    },
+    {
+      "title": "SSRF via 'url' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'url'. The server made a request to http://127.0.0.1 when injected via 'url'. Type: localhost IPv4.",
+      "evidence": "URL: http://scanme.nmap.org\nParameter: url\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'welcome to'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'link' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'link'. The server made a request to http://127.0.0.1 when injected via 'link'. Type: localhost IPv4.",
+      "evidence": "URL: http://scanme.nmap.org\nParameter: link\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'welcome to'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'src' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'src'. The server made a request to http://127.0.0.1 when injected via 'src'. Type: localhost IPv4.",
+      "evidence": "URL: http://scanme.nmap.org\nParameter: src\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'welcome to'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "SSRF via 'callback' parameter (localhost IPv4)",
+      "severity": "high",
+      "tool": "ssrf_detector",
+      "description": "Server-Side Request Forgery detected in parameter 'callback'. The server made a request to http://127.0.0.1 when injected via 'callback'. Type: localhost IPv4.",
+      "evidence": "URL: http://scanme.nmap.org\nParameter: callback\nPayload: http://127.0.0.1\nIndicator: Localhost content indicator: 'welcome to'",
+      "cwe_id": "CWE-918",
+      "cvss_score": 6.5,
+      "remediation": "Validate and sanitize all URL inputs. Use an allowlist of permitted domains/IPs. Block requests to private IP ranges (127.0.0.0/8, 10.0.0.0/8, 169.254.169.254, etc.). Disable unnecessary URL schemes."
+    },
+    {
+      "title": "Host Header Injection: Host Override",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using Host Override. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: Host Override\nURL: https://nmap.org\nIndicator: Evil host 'evil.vulnhunter-test.com' reflected in response body",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Host Header Injection: X-Original-URL",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Original-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: X-Original-URL\nURL: https://nmap.org\nIndicator: Path override returned status 200 (expected 404)",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Host Header Injection: X-Rewrite-URL",
+      "severity": "high",
+      "tool": "host_header_injection",
+      "description": "The server reflects or processes the injected host header 'evil.vulnhunter-test.com' when using X-Rewrite-URL. This can enable password reset poisoning, web cache poisoning, or access to internal resources.",
+      "evidence": "Test: X-Rewrite-URL\nURL: https://nmap.org\nIndicator: Path override returned status 200 (expected 404)",
+      "cwe_id": "CWE-644",
+      "cvss_score": 10.0,
+      "remediation": "Validate the Host header against a whitelist of expected hostnames. Ignore X-Forwarded-Host unless from a trusted reverse proxy. Use absolute URLs with a configured base domain for password reset links."
+    },
+    {
+      "title": "Password Reset Poisoning via Host Header",
+      "severity": "critical",
+      "tool": "host_header_injection",
+      "description": "Password reset endpoint https://nmap.org/reset-password uses the Host header to generate the reset link. An attacker can poison the Host to steal reset tokens.",
+      "evidence": "URL: https://nmap.org/reset-password\nInjected Host: evil.vulnhunter-test.com\nIndicator: Reset page reflects poisoned host 'evil.vulnhunter-test.com'",
+      "cwe_id": "CWE-644",
+      "cvss_score": 6.5,
+      "remediation": "Use a hardcoded base URL for password reset links, not the Host header."
+    }
+  ],
+  "remediation_steps": [
+    {
+      "priority": "Immediate (24-48 hours)",
+      "actions": [
+        "1. Enable HTTPS on scanme.nmap.org with proper SSL/TLS configuration",
+        "2. Fix password reset poisoning by removing Host header dependency",
+        "3. Implement SSRF protections with internal IP blocking",
+        "4. Disable or secure FTP service (port 21)"
+      ]
+    },
+    {
+      "priority": "Short-term (1 week)",
+      "actions": [
+        "1. Implement comprehensive security headers across all domains",
+        "2. Fix open redirect vulnerabilities with URL validation",
+        "3. Add SPF and DMARC records for email authentication",
+        "4. Conduct code review for all user input handling"
+      ]
+    },
+    {
+      "priority": "Long-term (1 month)",
+      "actions": [
+        "1. Implement Web Application Firewall (WAF) rules",
+        "2. Conduct penetration testing of all subdomains",
+        "3. Implement security monitoring and alerting",
+        "4. Establish bug bounty program for continuous testing"
+      ]
+    }
+  ],
+  "tool_results": [
+    {
+      "tool": "subdomain_enum",
+      "success": false,
+      "duration": 0.81,
+      "findings": 0,
+      "error": "crt.sh returned HTTP 502"
+    },
+    {
+      "tool": "subfinder_enum",
+      "success": false,
+      "duration": 0.12,
+      "findings": 0,
+      "error": "subfinder_enum requires Docker sandbox mode"
+    },
+    {
+      "tool": "dns_enum",
+      "success": true,
+      "duration": 15.8,
+      "findings": 2,
+      "error": ""
+    },
+    {
+      "tool": "whois_lookup",
+      "success": true,
+      "duration": 2.05,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "port_scanner",
+      "success": true,
+      "duration": 10.41,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "nmap_scan",
+      "success": false,
+      "duration": 0.31,
+      "findings": 0,
+      "error": "nmap_scan requires Docker sandbox mode (--sandbox or sandbox.enabled=true)"
+    },
+    {
+      "tool": "ssl_checker",
+      "success": true,
+      "duration": 3.72,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "tech_fingerprint",
+      "success": true,
+      "duration": 1.03,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "header_analyzer",
+      "success": true,
+      "duration": 0.84,
+      "findings": 8,
+      "error": ""
+    },
+    {
+      "tool": "web_scraper",
+      "success": true,
+      "duration": 0.62,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "shodan_search",
+      "success": false,
+      "duration": 0.45,
+      "findings": 0,
+      "error": "SHODAN_API_KEY not set — skipping Shodan lookup"
+    },
+    {
+      "tool": "search_engine",
+      "success": true,
+      "duration": 0.92,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "search_engine",
+      "success": true,
+      "duration": 0.94,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "url_harvester",
+      "success": true,
+      "duration": 1.69,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "js_analyzer",
+      "success": true,
+      "duration": 1.55,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "js_analyzer",
+      "success": true,
+      "duration": 1.47,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "param_discovery",
+      "success": true,
+      "duration": 0.64,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "port_scanner",
+      "success": true,
+      "duration": 12.22,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "port_scanner",
+      "success": true,
+      "duration": 0.2,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "port_scanner",
+      "success": true,
+      "duration": 0.41,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "katana_crawl",
+      "success": false,
+      "duration": 0.39,
+      "findings": 0,
+      "error": "katana_crawl requires Docker sandbox mode"
+    },
+    {
+      "tool": "httpx_probe",
+      "success": false,
+      "duration": 0.0,
+      "findings": 0,
+      "error": "httpx_probe requires Docker sandbox mode"
+    },
+    {
+      "tool": "dns_enum",
+      "success": true,
+      "duration": 5.48,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "takeover_check",
+      "success": true,
+      "duration": 0.19,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "tech_fingerprint",
+      "success": true,
+      "duration": 0.8,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "tech_fingerprint",
+      "success": true,
+      "duration": 2.27,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "ssl_checker",
+      "success": true,
+      "duration": 1.12,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "header_analyzer",
+      "success": true,
+      "duration": 1.95,
+      "findings": 7,
+      "error": ""
+    },
+    {
+      "tool": "search_engine",
+      "success": true,
+      "duration": 0.73,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "subdomain_enum",
+      "success": false,
+      "duration": 0.58,
+      "findings": 0,
+      "error": "crt.sh returned HTTP 502"
+    },
+    {
+      "tool": "subfinder_enum",
+      "success": false,
+      "duration": 0.41,
+      "findings": 0,
+      "error": "subfinder_enum requires Docker sandbox mode"
+    },
+    {
+      "tool": "dns_enum",
+      "success": true,
+      "duration": 0.33,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "takeover_check",
+      "success": true,
+      "duration": 0.02,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "port_scanner",
+      "success": true,
+      "duration": 10.3,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "nmap_scan",
+      "success": false,
+      "duration": 0.16,
+      "findings": 0,
+      "error": "nmap_scan requires Docker sandbox mode (--sandbox or sandbox.enabled=true)"
+    },
+    {
+      "tool": "port_scanner",
+      "success": true,
+      "duration": 2.34,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "tech_fingerprint",
+      "success": true,
+      "duration": 1.56,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "tech_fingerprint",
+      "success": true,
+      "duration": 0.83,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "header_analyzer",
+      "success": true,
+      "duration": 1.27,
+      "findings": 7,
+      "error": ""
+    },
+    {
+      "tool": "header_analyzer",
+      "success": true,
+      "duration": 0.83,
+      "findings": 8,
+      "error": ""
+    },
+    {
+      "tool": "ssl_checker",
+      "success": true,
+      "duration": 1.22,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "url_harvester",
+      "success": true,
+      "duration": 30.8,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "url_harvester",
+      "success": true,
+      "duration": 7.28,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "js_analyzer",
+      "success": true,
+      "duration": 3.09,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "param_discovery",
+      "success": true,
+      "duration": 1.59,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_scraper",
+      "success": true,
+      "duration": 1.36,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "whois_lookup",
+      "success": true,
+      "duration": 2.14,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "shodan_search",
+      "success": false,
+      "duration": 0.45,
+      "findings": 0,
+      "error": "SHODAN_API_KEY not set — skipping Shodan lookup"
+    },
+    {
+      "tool": "search_engine",
+      "success": true,
+      "duration": 0.83,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "port_scanner",
+      "success": true,
+      "duration": 15.53,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "tech_fingerprint",
+      "success": true,
+      "duration": 0.72,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "ssl_checker",
+      "success": true,
+      "duration": 3.8,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "search_engine",
+      "success": false,
+      "duration": 0.25,
+      "findings": 0,
+      "error": "DuckDuckGo returned HTTP 202"
+    },
+    {
+      "tool": "web_scraper",
+      "success": true,
+      "duration": 0.83,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "param_discovery",
+      "success": true,
+      "duration": 0.77,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "js_analyzer",
+      "success": true,
+      "duration": 1.12,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "url_harvester",
+      "success": true,
+      "duration": 14.72,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_scraper",
+      "success": true,
+      "duration": 1.62,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "subdomain_enum",
+      "success": false,
+      "duration": 0.7,
+      "findings": 0,
+      "error": "crt.sh returned HTTP 502"
+    },
+    {
+      "tool": "subfinder_enum",
+      "success": false,
+      "duration": 0.48,
+      "findings": 0,
+      "error": "subfinder_enum requires Docker sandbox mode"
+    },
+    {
+      "tool": "dns_enum",
+      "success": true,
+      "duration": 10.81,
+      "findings": 2,
+      "error": ""
+    },
+    {
+      "tool": "whois_lookup",
+      "success": true,
+      "duration": 2.28,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "nmap_scan",
+      "success": false,
+      "duration": 0.16,
+      "findings": 0,
+      "error": "nmap_scan requires Docker sandbox mode (--sandbox or sandbox.enabled=true)"
+    },
+    {
+      "tool": "port_scanner",
+      "success": true,
+      "duration": 2.17,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "ssl_checker",
+      "success": true,
+      "duration": 3.59,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "header_analyzer",
+      "success": true,
+      "duration": 0.64,
+      "findings": 8,
+      "error": ""
+    },
+    {
+      "tool": "tech_fingerprint",
+      "success": true,
+      "duration": 1.02,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_scraper",
+      "success": true,
+      "duration": 0.61,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "url_harvester",
+      "success": true,
+      "duration": 30.44,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "url_harvester",
+      "success": true,
+      "duration": 3.22,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "js_analyzer",
+      "success": true,
+      "duration": 1.23,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "js_analyzer",
+      "success": true,
+      "duration": 1.12,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_scraper",
+      "success": true,
+      "duration": 0.8,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_scraper",
+      "success": true,
+      "duration": 0.7,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "param_discovery",
+      "success": true,
+      "duration": 0.84,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "shodan_search",
+      "success": false,
+      "duration": 0.45,
+      "findings": 0,
+      "error": "SHODAN_API_KEY not set — skipping Shodan lookup"
+    },
+    {
+      "tool": "search_engine",
+      "success": false,
+      "duration": 0.34,
+      "findings": 0,
+      "error": "DuckDuckGo returned HTTP 202"
+    },
+    {
+      "tool": "search_engine",
+      "success": true,
+      "duration": 0.95,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "katana_crawl",
+      "success": false,
+      "duration": 0.23,
+      "findings": 0,
+      "error": "katana_crawl requires Docker sandbox mode"
+    },
+    {
+      "tool": "httpx_probe",
+      "success": false,
+      "duration": 0.0,
+      "findings": 0,
+      "error": "httpx_probe requires Docker sandbox mode"
+    },
+    {
+      "tool": "js_analyzer",
+      "success": true,
+      "duration": 1.02,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "url_harvester",
+      "success": true,
+      "duration": 30.66,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "url_harvester",
+      "success": true,
+      "duration": 31.34,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_scraper",
+      "success": true,
+      "duration": 0.72,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_scraper",
+      "success": true,
+      "duration": 0.69,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_scraper",
+      "success": true,
+      "duration": 0.81,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "param_discovery",
+      "success": true,
+      "duration": 0.56,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "dir_bruteforce",
+      "success": true,
+      "duration": 1.31,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "dir_bruteforce",
+      "success": true,
+      "duration": 1.64,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 6.5,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 4.81,
+      "findings": 8,
+      "error": ""
+    },
+    {
+      "tool": "cors_check",
+      "success": true,
+      "duration": 6.83,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "ssrf_detector",
+      "success": true,
+      "duration": 7.58,
+      "findings": 16,
+      "error": ""
+    },
+    {
+      "tool": "host_header_injection",
+      "success": true,
+      "duration": 4.19,
+      "findings": 4,
+      "error": ""
+    },
+    {
+      "tool": "access_control_test",
+      "success": true,
+      "duration": 11.31,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "graphql_test",
+      "success": true,
+      "duration": 7.78,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "nuclei_scan",
+      "success": false,
+      "duration": 0.14,
+      "findings": 0,
+      "error": "nuclei_scan requires Docker sandbox mode"
+    },
+    {
+      "tool": "nikto_scan",
+      "success": false,
+      "duration": 0.31,
+      "findings": 0,
+      "error": "nikto_scan requires Docker sandbox mode"
+    },
+    {
+      "tool": "cve_lookup",
+      "success": true,
+      "duration": 0.88,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cve_lookup",
+      "success": true,
+      "duration": 0.72,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "sqlmap_scan",
+      "success": false,
+      "duration": 0.33,
+      "findings": 0,
+      "error": "sqlmap_scan requires Docker sandbox mode"
+    },
+    {
+      "tool": "ffuf_scan",
+      "success": false,
+      "duration": 0.14,
+      "findings": 0,
+      "error": "ffuf_scan requires Docker sandbox mode"
+    },
+    {
+      "tool": "idor_detector",
+      "success": true,
+      "duration": 18.41,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "ssrf_detector",
+      "success": true,
+      "duration": 2.3,
+      "findings": 4,
+      "error": ""
+    },
+    {
+      "tool": "host_header_injection",
+      "success": true,
+      "duration": 4.8,
+      "findings": 3,
+      "error": ""
+    },
+    {
+      "tool": "cors_check",
+      "success": true,
+      "duration": 2.64,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cors_check",
+      "success": true,
+      "duration": 2.25,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cors_check",
+      "success": true,
+      "duration": 3.97,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cors_check",
+      "success": true,
+      "duration": 8.19,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 6.56,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 23.66,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "dir_bruteforce",
+      "success": true,
+      "duration": 1.47,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "dir_bruteforce",
+      "success": true,
+      "duration": 2.53,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cve_lookup",
+      "success": true,
+      "duration": 0.67,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cve_lookup",
+      "success": true,
+      "duration": 1.03,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "ffuf_scan",
+      "success": false,
+      "duration": 0.12,
+      "findings": 0,
+      "error": "ffuf_scan requires Docker sandbox mode"
+    },
+    {
+      "tool": "host_header_injection",
+      "success": true,
+      "duration": 4.23,
+      "findings": 3,
+      "error": ""
+    },
+    {
+      "tool": "access_control_test",
+      "success": true,
+      "duration": 8.09,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "nuclei_scan",
+      "success": false,
+      "duration": 0.22,
+      "findings": 0,
+      "error": "nuclei_scan requires Docker sandbox mode"
+    },
+    {
+      "tool": "nikto_scan",
+      "success": false,
+      "duration": 0.44,
+      "findings": 0,
+      "error": "nikto_scan requires Docker sandbox mode"
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 7.27,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 4.14,
+      "findings": 8,
+      "error": ""
+    },
+    {
+      "tool": "ssrf_detector",
+      "success": true,
+      "duration": 1.44,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "ssrf_detector",
+      "success": true,
+      "duration": 1.12,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "ssrf_detector",
+      "success": true,
+      "duration": 1.33,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "cors_check",
+      "success": true,
+      "duration": 8.11,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "access_control_test",
+      "success": true,
+      "duration": 13.42,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 6.05,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "ssrf_detector",
+      "success": true,
+      "duration": 42.44,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cors_check",
+      "success": true,
+      "duration": 8.83,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 4.69,
+      "findings": 8,
+      "error": ""
+    },
+    {
+      "tool": "ssrf_detector",
+      "success": true,
+      "duration": 1.33,
+      "findings": 1,
+      "error": ""
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 4.61,
+      "findings": 8,
+      "error": ""
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 4.5,
+      "findings": 8,
+      "error": ""
+    },
+    {
+      "tool": "idor_detector",
+      "success": true,
+      "duration": 5.42,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "nuclei_scan",
+      "success": false,
+      "duration": 0.48,
+      "findings": 0,
+      "error": "nuclei_scan requires Docker sandbox mode"
+    },
+    {
+      "tool": "cve_lookup",
+      "success": true,
+      "duration": 0.78,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cve_lookup",
+      "success": true,
+      "duration": 0.72,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cve_lookup",
+      "success": true,
+      "duration": 1.05,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "dir_bruteforce",
+      "success": true,
+      "duration": 1.08,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cors_check",
+      "success": true,
+      "duration": 2.16,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 7.48,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "host_header_injection",
+      "success": true,
+      "duration": 5.25,
+      "findings": 3,
+      "error": ""
+    },
+    {
+      "tool": "access_control_test",
+      "success": true,
+      "duration": 7.97,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "ssrf_detector",
+      "success": true,
+      "duration": 2.27,
+      "findings": 4,
+      "error": ""
+    },
+    {
+      "tool": "idor_detector",
+      "success": true,
+      "duration": 0.28,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "ffuf_scan",
+      "success": false,
+      "duration": 0.33,
+      "findings": 0,
+      "error": "ffuf_scan requires Docker sandbox mode"
+    },
+    {
+      "tool": "graphql_test",
+      "success": true,
+      "duration": 5.02,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "nikto_scan",
+      "success": false,
+      "duration": 0.16,
+      "findings": 0,
+      "error": "nikto_scan requires Docker sandbox mode"
+    },
+    {
+      "tool": "cors_check",
+      "success": true,
+      "duration": 4.75,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "web_vuln_scanner",
+      "success": true,
+      "duration": 26.52,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "ssrf_detector",
+      "success": true,
+      "duration": 38.75,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "host_header_injection",
+      "success": true,
+      "duration": 10.36,
+      "findings": 4,
+      "error": ""
+    },
+    {
+      "tool": "dir_bruteforce",
+      "success": true,
+      "duration": 2.89,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "access_control_test",
+      "success": true,
+      "duration": 189.23,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "graphql_test",
+      "success": true,
+      "duration": 77.22,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "idor_detector",
+      "success": true,
+      "duration": 0.36,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cve_lookup",
+      "success": true,
+      "duration": 1.64,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cve_lookup",
+      "success": true,
+      "duration": 0.78,
+      "findings": 0,
+      "error": ""
+    },
+    {
+      "tool": "cve_lookup",
+      "success": true,
+      "duration": 0.75,
+      "findings": 0,
+      "error": ""
+    }
+  ]
+}

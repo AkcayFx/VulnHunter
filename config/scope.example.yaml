@@ -1,0 +1,31 @@
+# VulnHunter Scope Definition
+# Copy this file and customize for your bug bounty program.
+# Usage: vulnhunter scan example.com --scope config/scope.yaml
+
+program: "Example Corp Bug Bounty"
+platform: "hackerone"  # hackerone, bugcrowd, custom
+
+in_scope:
+  domains:
+    - "*.example.com"
+    - "api.example.com"
+  ips:
+    - "203.0.113.0/24"
+  ports: [80, 443, 8080, 8443]
+
+out_of_scope:
+  domains:
+    - "corporate.example.com"
+    - "staging-internal.example.com"
+  paths:
+    - "/api/admin/*"
+    - "/debug/*"
+    - "/health"
+
+rules:
+  - "Do not test accounts you don't own"
+  - "No denial of service"
+  - "No physical attacks"
+  - "No social engineering"
+
+max_rps: 10

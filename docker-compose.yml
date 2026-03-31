@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: vulnhunter-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: vulnhunter
+      POSTGRES_PASSWORD: vulnhunter
+      POSTGRES_DB: vulnhunter
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vulnhunter"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  vulnhunter:
+    build: .
+    container_name: vulnhunter-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://vulnhunter:vulnhunter@postgres:5432/vulnhunter
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-nvidia/nemotron-3-super-120b-a12b:free}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-vulnhunter-production-secret}
+    ports:
+      - "8477:8477"
+    volumes:
+      - ./reports:/app/reports
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - default
+      - sandbox
+
+networks:
+  sandbox:
+    name: vulnhunter-sandbox
+    driver: bridge
+
+volumes:
+  pgdata:

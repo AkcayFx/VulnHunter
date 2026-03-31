@@ -1,0 +1,124 @@
+scanner:
+  timeout: 60
+  max_concurrent: 100
+  stealth_mode: "normal"  # quiet, normal, aggressive
+
+stealth:
+  mode: "normal"
+  max_rps: 10
+  request_jitter_ms: [100, 500]
+  user_agents: "rotate"    # rotate, static, browser
+  proxy: null
+  waf_detection: true
+  respect_robots_txt: true
+  respect_rate_limit_headers: true
+
+tools:
+  port_scanner:
+    enabled: true
+    default_ports: [21, 22, 23, 25, 53, 80, 110, 135, 139, 143, 443, 445, 993, 995, 1433, 1521, 3306, 3389, 5432, 5900, 6379, 8080, 8443, 8888, 9200, 27017]
+    connect_timeout: 2
+  header_analyzer:
+    enabled: true
+  ssl_checker:
+    enabled: true
+  dns_enum:
+    enabled: true
+  whois_lookup:
+    enabled: true
+  dir_bruteforce:
+    enabled: true
+    wordlist: "common"
+    max_requests: 200
+  cve_lookup:
+    enabled: true
+  web_vuln_scanner:
+    enabled: true
+    test_sqli: true
+    test_xss: true
+    test_open_redirect: true
+  web_scraper:
+    enabled: true
+  shodan_search:
+    enabled: true
+  search_engine:
+    enabled: true
+  subdomain_enum:
+    enabled: true
+  tech_fingerprint:
+    enabled: true
+  # Bug Bounty Recon Pipeline
+  url_harvester:
+    enabled: true
+    limit: 500
+  js_analyzer:
+    enabled: true
+    max_js_files: 20
+  param_discovery:
+    enabled: true
+  takeover_check:
+    enabled: true
+  cors_check:
+    enabled: true
+  # Advanced Vulnerability Detection (Phase 5)
+  ssrf_detector:
+    enabled: true
+  idor_detector:
+    enabled: true
+  host_header_injection:
+    enabled: true
+  access_control_test:
+    enabled: true
+  graphql_test:
+    enabled: true
+  # Pro tools (require Docker sandbox)
+  nmap_scan:
+    enabled: true
+  nuclei_scan:
+    enabled: true
+  ffuf_scan:
+    enabled: true
+  sqlmap_scan:
+    enabled: true
+  nikto_scan:
+    enabled: true
+  httpx_probe:
+    enabled: true
+  subfinder_enum:
+    enabled: true
+  katana_crawl:
+    enabled: true
+
+ai:
+  enabled: true
+  # Provider auto-detected from env vars. Override with LLM_PROVIDER env var.
+  # Supported: deepseek, openai, anthropic, gemini, ollama, openrouter, groq
+  # provider: "deepseek"
+  # model: "deepseek-chat"
+  # base_url: "https://api.deepseek.com/v1"
+  max_tokens: 8000
+  max_tool_calls: 30
+
+agents:
+  orchestrator:
+    enabled: true
+  recon:
+    enabled: true
+  exploit:
+    enabled: true
+  reporter:
+    enabled: true
+
+reporting:
+  output_dir: "./reports"
+  formats: ["json", "html"]
+
+sandbox:
+  enabled: false
+  image: "vulnhunter-sandbox:latest"
+  network: "vulnhunter-sandbox"
+  timeout: 300
+
+ui:
+  host: "127.0.0.1"
+  port: 8477
